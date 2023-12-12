@@ -31,7 +31,7 @@ public class User  implements UserDetails {
     private int userId;
 
     @Column(name = "userName", unique = true)
-    private String username;
+    private String name;
 
     @Column(name = "email", unique = true)
     private String email;
@@ -58,11 +58,11 @@ public class User  implements UserDetails {
     @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 
-    @Column(name = "enabled")
-    private boolean enabled;
+    @Column(name = "is_verified")
+    private boolean isVerified;
 
-    @Column(name = "locked")
-    private boolean locked;
+
+
 
 
     @ManyToMany(targetEntity = Role.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -81,7 +81,6 @@ public class User  implements UserDetails {
         return grantedAuthorities;
     }
 
-
     @Override
     public String getUsername() {
         return email;
@@ -94,7 +93,7 @@ public class User  implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !locked;
+        return true;
     }
 
     @Override
@@ -104,6 +103,6 @@ public class User  implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return true;
     }
 }

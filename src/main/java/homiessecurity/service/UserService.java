@@ -18,4 +18,6 @@ public interface UserService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException;
 
     List<UserDto> getAllUsers();
+
+    int verifyUser(String email);
 }

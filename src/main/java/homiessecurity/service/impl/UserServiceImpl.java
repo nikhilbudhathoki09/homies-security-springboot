@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 
     @Override
     public User getUserByName(String name) {
-        return userRepo.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User", "username", name));
+        return userRepo.findByName(name).orElseThrow(() -> new ResourceNotFoundException("User", "username", name));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService, UserDetailsService{
             .orElseGet(() -> roleRepo.save(Role.builder().title("USER").description("Normal User").build()));
 
             
-        User user = User.builder().username(register.getUsername())
+        User user = User.builder().name(register.getUsername())
                                   .phoneNumber(register.getPhoneNumber())
                                   .email(register.getEmail())
                                   .password(register.getPassword())
@@ -109,6 +109,11 @@ public class UserServiceImpl implements UserService, UserDetailsService{
     public List<UserDto> getAllUsers() {
         List<UserDto> allUsers = this.userRepo.findAll().stream().map(user -> modelMapper.map(user, UserDto.class)).collect(Collectors.toList());
         return allUsers;
+    }
+
+    @Override
+    public int verifyUser(String email) {
+        return userRepo.verifyUser(email);
     }
 
 //    @Override
