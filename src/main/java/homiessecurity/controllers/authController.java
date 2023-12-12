@@ -37,10 +37,8 @@ public class authController {
     }
 
     @PostMapping(value = "/verify")
-    public ResponseEntity<?>verifyUser(@RequestParam String token){
-        EmailVerification emailVerification = emailService.getEmailVerificationByToken(token);
-        System.out.println(emailVerification);
-        return ResponseEntity.ok(emailVerification);
+    public ResponseEntity<String>verifyUser(@RequestParam String token){
+        return new ResponseEntity<String>(emailService.confirmToken(token), HttpStatus.OK);
     }
 
 

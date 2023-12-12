@@ -14,4 +14,6 @@ public interface EmailVerificationService {
 
     public EmailVerification getEmailVerificationByToken(String token);
 
+    public String confirmToken(String token);
+
 }
