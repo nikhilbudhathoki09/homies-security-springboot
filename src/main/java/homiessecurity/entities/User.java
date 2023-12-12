@@ -58,6 +58,12 @@ public class User  implements UserDetails {
     @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 
+    @Column(name = "enabled")
+    private boolean enabled;
+
+    @Column(name = "locked")
+    private boolean locked;
+
 
     @ManyToMany(targetEntity = Role.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "userRoles", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "roleId"))
@@ -76,7 +82,6 @@ public class User  implements UserDetails {
     }
 
 
-
     @Override
     public String getUsername() {
         return email;
@@ -89,7 +94,7 @@ public class User  implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !locked;
     }
 
     @Override
@@ -99,6 +104,6 @@ public class User  implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }

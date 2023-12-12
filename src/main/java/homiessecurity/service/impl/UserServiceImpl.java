@@ -18,7 +18,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -101,6 +103,12 @@ public class UserServiceImpl implements UserService, UserDetailsService{
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return this.userRepo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+
+    @Override
+    public List<UserDto> getAllUsers() {
+        List<UserDto> allUsers = this.userRepo.findAll().stream().map(user -> modelMapper.map(user, UserDto.class)).collect(Collectors.toList());
+        return allUsers;
     }
 
 //    @Override

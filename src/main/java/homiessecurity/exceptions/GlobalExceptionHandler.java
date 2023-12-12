@@ -1,6 +1,7 @@
 package homiessecurity.exceptions;
 
-import com.backend.homies.payloads.ApiResponse;
+
+import homiessecurity.payload.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -18,13 +20,7 @@ public class UserController {
         this.userService = userService;
 
     }
-    @RequestMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterDto registerDto
-                                          ){
 
-        UserDto user = this.userService.registerUser(registerDto);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
-    }
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUserDetails(@PathVariable Integer userId){
         UserDto user = this.userService.getUserById(userId);
@@ -32,4 +28,10 @@ public class UserController {
         return new ResponseEntity<UserDto>(user, HttpStatus.OK);
     }
 
+
+    @GetMapping("/")
+    public ResponseEntity<List<UserDto>> getAllUsers(){
+        var allUsers = this.userService.getAllUsers();
+        return new ResponseEntity<>(allUsers, HttpStatus.OK);
+    }
 }
