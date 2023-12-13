@@ -5,7 +5,7 @@ import homiessecurity.entities.EmailVerification;
 import homiessecurity.entities.User;
 import org.springframework.stereotype.Service;
 
-@Service
+
 public interface EmailVerificationService {
 
     public EmailVerificationResponse getEmailVerification(User user);

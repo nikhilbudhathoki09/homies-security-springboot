@@ -10,6 +10,7 @@ import homiessecurity.entities.Role;
 import homiessecurity.entities.User;
 import homiessecurity.exceptions.ResourceAlreadyExistsException;
 import homiessecurity.exceptions.ResourceNotFoundException;
+import homiessecurity.payload.ApiResponse;
 import homiessecurity.repository.RefreshTokenRepository;
 import homiessecurity.repository.RoleRepository;
 import homiessecurity.repository.UserRepository;
@@ -45,7 +46,7 @@ public class AuthenticationService {
     private final EmailSenderService emailSenderService;
 
 
-    public AuthenticationResponse register(UserRegisterDto request)  {
+    public ApiResponse register(UserRegisterDto request)  {
 
         if(userRepo.existsByEmail(request.getEmail()))
             throw new ResourceAlreadyExistsException("Email already exists. Try a new one");
@@ -54,8 +55,8 @@ public class AuthenticationService {
         }
 
         //searching the role from the table if not found creating a role
-        Role userRole = roleRepo.findByTitle("USER")
-                .orElseGet(() -> roleRepo.save(Role.builder().title("USER").description("Normal User").build()));
+        Role userRole = roleRepo.findByTitle("ROLE_USER")
+                .orElseGet(() -> roleRepo.save(Role.builder().title("ROLE_USER").description("Normal User").build()));
 
         var user = User.builder()
                 .name(request.getUsername())
@@ -91,9 +92,11 @@ public class AuthenticationService {
             throw new RuntimeException(e);
         }
 
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .build();
+//        return AuthenticationResponse.builder()
+//                .accessToken(jwtToken)
+//                .build();
+
+        return new ApiResponse("User sucessfully registered", true);
     }
 
     public AuthenticationResponse authenticate(LoginRequest request){
