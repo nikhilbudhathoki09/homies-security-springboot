@@ -20,4 +20,6 @@ public interface UserService {
     List<UserDto> getAllUsers();
 
     int verifyUser(String email);
+
+
 }

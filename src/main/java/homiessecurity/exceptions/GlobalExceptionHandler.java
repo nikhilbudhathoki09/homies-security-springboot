@@ -1,6 +1,7 @@
 package homiessecurity.exceptions;
 
 
+import homiessecurity.payload.ApiException;
 import homiessecurity.payload.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,12 @@ public class GlobalExceptionHandler {
         });
 
         return new ResponseEntity<Map<String, String>>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InternalServerError.class)
+    public ResponseEntity<ApiException> handleInternalServerError(InternalServerError ex){
+        ApiException errorResponse = new ApiException(ex.getMessage(), ex.getStatus(), ex.getTimeStamp());
+        return new ResponseEntity<ApiException>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 

@@ -92,12 +92,12 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 
         return this.modelMapper.map(createdUser, UserDto.class);
     }
+
     @Override
     public User loginUser() {
-
-
         return null;
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -116,10 +116,38 @@ public class UserServiceImpl implements UserService, UserDetailsService{
         return userRepo.verifyUser(email);
     }
 
-//    @Override
-//    public User updateUser(Integer userId, User user) {
-//        return null;
-//    }
+
+    public UserDto updateUser(UserDto userDto) {
+        User user = this.userRepo.findByEmail(userDto.getEmail()).orElseThrow(() ->
+                new ResourceNotFoundException("User", "email", userDto.getEmail()));
+
+        user.setName(userDto.getName());
+        user.setPhoneNumber(userDto.getPhoneNumber());
+        user.setEmail(userDto.getEmail());
+        user.setGender(userDto.getGender());
+        user.setAddress(userDto.getAddress());
+        user.setUpdatedAt(LocalDateTime.now());
+        User updatedUser = this.userRepo.save(user);
+        return this.modelMapper.map(updatedUser, UserDto.class);
+    }
+
+    //i need a admin to be created and a function named register admin and provide a role named ROLE_ADMIN
+
+    // public UserDto registerAdmin(UserRegisterDto register) {
+    //     //if the email and phoneNumber already exists then should try a new one
+    //     if(userRepo.existsByEmail(register.getEmail())){
+    //         throw new ResourceAlreadyExistsException("Email already exists. Try a new one");
+    //     }
+    //     if(userRepo.existsByPhoneNumber(register.getPhoneNumber())){
+    //         throw new ResourceAlreadyExistsException("PhoneNumber is already  in use. Try a new one ");
+    //     }
+
+    //     //searching the role from the table if not found creating a role
+    //     Role userRole = roleRepo.findByTitle("ADMIN")
+    //         .orElseGet(() -> roleRepo.save(Role.builder().title("ADMIN").description("Admin User").build()));
+
+
+
 
 
 }

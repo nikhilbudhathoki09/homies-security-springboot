@@ -7,6 +7,7 @@ import homiessecurity.entities.EmailVerification;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.service.AuthenticationService;
 import homiessecurity.service.EmailVerificationService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,14 +28,13 @@ public class authController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> registerUser(@RequestBody UserRegisterDto register ){
+    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody UserRegisterDto register ){
         ApiResponse response = this.authService.register(register);
         return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest request){
-        System.out.println("Inside the login controller");
         AuthenticationResponse response = this.authService.authenticate(request);
         return new ResponseEntity<AuthenticationResponse>(response, HttpStatus.OK);
     }
