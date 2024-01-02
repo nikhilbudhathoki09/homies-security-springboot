@@ -76,8 +76,6 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         String url = "http://localhost:8000/api/v1/auth/verify?token=" + token;
         System.out.println(url);
         return url;
-
-
     }
 
 
