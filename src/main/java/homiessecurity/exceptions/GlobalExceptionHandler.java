@@ -53,6 +53,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ApiException>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiException> handleBadCredentialsException(BadCredentialsException e){
+        ApiException errorResponse = new ApiException(e.getMessage(), e.getStatus(), e.getTimeStamp());
+        return new ResponseEntity<ApiException>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 
     
 }
