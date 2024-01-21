@@ -21,6 +21,7 @@ public class UserDto {
     private String gender;
     private String userImage;
     private Set<Role> userRoles;
+    private boolean isVerified;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

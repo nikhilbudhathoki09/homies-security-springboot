@@ -28,7 +28,6 @@ public class UserController {
         return new ResponseEntity<UserDto>(user, HttpStatus.OK);
     }
 
-
     @GetMapping("/")
     public ResponseEntity<List<UserDto>> getAllUsers(){
         var allUsers = this.userService.getAllUsers();
