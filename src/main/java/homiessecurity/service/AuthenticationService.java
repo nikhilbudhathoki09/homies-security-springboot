@@ -1,13 +1,12 @@
 package homiessecurity.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import homiessecurity.dtos.Auth.AuthenticationResponse;
 import homiessecurity.dtos.Auth.LoginRequest;
 import homiessecurity.dtos.EmailVerification.EmailVerificationResponse;
-import homiessecurity.dtos.UserRegisterDto;
-import homiessecurity.entities.RefreshToken;
+import homiessecurity.dtos.Users.UserRegisterDto;
 import homiessecurity.entities.Role;
 import homiessecurity.entities.User;
+import homiessecurity.exceptions.CustomAuthenticationException;
 import homiessecurity.exceptions.ResourceAlreadyExistsException;
 import homiessecurity.exceptions.ResourceNotFoundException;
 import homiessecurity.payload.ApiResponse;
@@ -17,16 +16,13 @@ import homiessecurity.repository.UserRepository;
 import homiessecurity.security.JwtService;
 import homiessecurity.service.impl.UserServiceImpl;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -46,7 +42,7 @@ public class AuthenticationService {
     private final EmailSenderService emailSenderService;
 
 
-    public ApiResponse register(UserRegisterDto request)  {
+    public ApiResponse registerUser(UserRegisterDto request)  {
 
         if(userRepo.existsByEmail(request.getEmail()))
             throw new ResourceAlreadyExistsException("Email already exists. Try a new one");
@@ -96,28 +92,33 @@ public class AuthenticationService {
 //                .accessToken(jwtToken)
 //                .build();
 
-        return new ApiResponse("User sucessfully registered", true);
+        return new ApiResponse("User Registered. Please verify your email to proceed.", true);
     }
 
-    public AuthenticationResponse authenticate(LoginRequest request){
+    public AuthenticationResponse authenticateUser(LoginRequest request) {
+        try {
+            if (!userRepo.existsByEmail(request.getEmail())) {
+                throw new ResourceNotFoundException("User", "email", request.getEmail());
+            }
 
-        if(!userRepo.existsByEmail(request.getEmail())){
-            throw new ResourceNotFoundException("User" , "email", request.getEmail());}
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword())
+            );
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword())
-        );
+            var user = userService.loadUserByUsername(request.getEmail());
 
-        var user = userService.loadUserByUsername(request.getEmail());
-
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .build();
-
+            var jwtToken = jwtService.generateToken(user);
+            return AuthenticationResponse.builder()
+                    .accessToken(jwtToken)
+                    .build();
+        } catch (BadCredentialsException e) {
+            // Handle bad credentials exception and throw a custom exception with a meaningful message
+            throw new CustomAuthenticationException("Invalid credentials. Please check your email and password.");
+        }
     }
+
 
 
 

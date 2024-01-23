@@ -1,4 +1,4 @@
-package homiessecurity.dtos;
+package homiessecurity.dtos.Users;
 
 import homiessecurity.entities.Role;
 import lombok.*;

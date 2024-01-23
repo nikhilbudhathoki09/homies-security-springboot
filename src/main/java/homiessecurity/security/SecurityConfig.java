@@ -19,36 +19,14 @@ public class SecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-//        http.
-//                csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(requests ->
-//                        requests
-//                                .requestMatchers("/api/v1/auth/**")
-//                                .permitAll()
-//                                .requestMatchers("/api/v1/**").permitAll()
-//                                .anyRequest()
-//                                .authenticated())
-//                .sessionManagement(management ->
-//                        management
-//                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authenticationProvider(authenticationProvider)
-//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-//
-//        return http.build();
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.
                 csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(requests ->
+                .authorizeHttpRequests((requests) ->
                         requests
-
-                                .requestMatchers("/api/v1/**")
-                                .permitAll()
                                 .requestMatchers("/api/v1/auth/**")
+//                                .requestMatchers("/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
@@ -60,6 +38,28 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+//        http.
+//                csrf(csrf -> csrf.disable())
+//                .authorizeHttpRequests(requests ->
+//                        requests
+//
+//                                .requestMatchers("/api/v1/**")
+//                                .permitAll()
+//                                .requestMatchers("/api/v1/auth/**")
+//                                .permitAll()
+//                                .anyRequest()
+//                                .authenticated())
+//                .sessionManagement(management ->
+//                        management
+//                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authenticationProvider(authenticationProvider)
+//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//        return http.build();
+//    }
 
 
 

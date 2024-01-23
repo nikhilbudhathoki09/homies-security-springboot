@@ -1,8 +1,8 @@
 package homiessecurity.service.impl;
 
 
-import homiessecurity.dtos.UserDto;
-import homiessecurity.dtos.UserRegisterDto;
+import homiessecurity.dtos.Users.UserDto;
+import homiessecurity.dtos.Users.UserRegisterDto;
 import homiessecurity.entities.Role;
 import homiessecurity.entities.User;
 import homiessecurity.exceptions.ResourceAlreadyExistsException;

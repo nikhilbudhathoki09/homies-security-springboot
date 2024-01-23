@@ -1,7 +1,7 @@
 package homiessecurity.service;
 
-import homiessecurity.dtos.UserDto;
-import homiessecurity.dtos.UserRegisterDto;
+import homiessecurity.dtos.Users.UserDto;
+import homiessecurity.dtos.Users.UserRegisterDto;
 import homiessecurity.entities.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

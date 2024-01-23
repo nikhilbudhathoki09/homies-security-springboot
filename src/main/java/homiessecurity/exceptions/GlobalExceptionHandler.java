@@ -32,8 +32,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.CONFLICT);
     }
 
-
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex){
 
@@ -53,11 +51,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ApiException>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-//    @ExceptionHandler(BadCredentialsException.class)
-//    public ResponseEntity<ApiException> handleBadCredentialsException(BadCredentialsException e){
-//        ApiException errorResponse = new ApiException(e.getMessage(), e.getStatus(), e.getTimeStamp());
-//        return new ResponseEntity<ApiException>(errorResponse, HttpStatus.BAD_REQUEST);
-//    }
+    @ExceptionHandler(CustomAuthenticationException.class)
+    public ResponseEntity<ApiResponse> handleCustomAuthenticationException(CustomAuthenticationException e){
+        ApiResponse response = new ApiResponse();
+        response.setMessage(e.getMessage());
+        response.setSuccess(false);
+        return new ResponseEntity<ApiResponse>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CustomCommonException.class)
+    public ResponseEntity<ApiResponse> handleCustomCommonException(CustomCommonException e){
+        ApiResponse response = new ApiResponse();
+        response.setMessage(e.getMessage());
+        response.setSuccess(false);
+        return new ResponseEntity<ApiResponse>(response, HttpStatus.BAD_REQUEST);
+    }
 
 
     

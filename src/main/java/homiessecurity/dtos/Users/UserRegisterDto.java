@@ -1,4 +1,4 @@
-package homiessecurity.dtos;
+package homiessecurity.dtos.Users;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
