@@ -10,8 +10,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/api/v1/auth")
 
 public class authController {
@@ -26,7 +28,9 @@ public class authController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody UserRegisterDto register ){
+    public ResponseEntity<ApiResponse> registerUser(@Valid @ModelAttribute UserRegisterDto register,
+                                                    @RequestParam(value = "userImage", required = false) MultipartFile file){
+        register.setUserImage(file);
         ApiResponse response = this.authService.registerUser(register);
         return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
     }

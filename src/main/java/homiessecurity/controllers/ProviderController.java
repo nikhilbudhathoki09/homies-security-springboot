@@ -13,6 +13,7 @@ import java.util.List;
 
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/api/v1/providers")
 public class ProviderController {
 
@@ -34,14 +35,23 @@ public class ProviderController {
         return new ResponseEntity<ProviderRegistrationRequestDto>(provider, HttpStatus.CREATED);
     }
 
-//    @GetMapping("/verified")
-//    public ResponseEntity<List<ServiceProvider>> getAllVerifiedProvider(){
-//        return new ResponseEntity<List<ServiceProvider>>(this.providerService.getAllVerifiedProviders(), HttpStatus.OK);
-//    }
-//
-//    @PostMapping("/register")
-//    public ResponseEntity<Provider> registerServiceProvider(@RequestBody ProviderRegistrationRequestDto register){
-//        ProviderRegistrationRequestDto provider = this.providerService.registerServiceProvider(register);
-//        return new ResponseEntity<ProviderRegistrationRequestDto>(provider, HttpStatus.CREATED);
-//    }
+    @GetMapping("/verified")
+    public ResponseEntity<List<ServiceProvider>> getAllVerifiedProvider(){
+        return new ResponseEntity<List<ServiceProvider>>(this.providerService.getAllVerifiedProviders(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{providerId}")
+    public ResponseEntity<ServiceProvider> getProviderById(@PathVariable Integer providerId){
+        return new ResponseEntity<ServiceProvider>(this.providerService.getServiceProviderById(providerId), HttpStatus.OK);
+    }
+
+    @PutMapping("/{providerId}/status")
+    public ResponseEntity<ServiceProvider> updateProviderStatus(@PathVariable Integer providerId, @RequestParam String status){
+        return new ResponseEntity<ServiceProvider>(this.providerService.updateProviderStatus(providerId, status), HttpStatus.OK);
+    }
+
+    @GetMapping("/approved")
+    public ResponseEntity<List<ServiceProvider>> getAllApprovedProviders(){
+        return new ResponseEntity<List<ServiceProvider>>(this.providerService.getAllApprovedProviders(), HttpStatus.OK);
+    }
 }

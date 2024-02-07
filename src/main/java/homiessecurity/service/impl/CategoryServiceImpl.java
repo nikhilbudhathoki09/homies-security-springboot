@@ -18,16 +18,27 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepo;
     private final ModelMapper modelMapper;
 
+    private final CloudinaryServiceImpl cloudinary;
+
+
     @Autowired
-    public CategoryServiceImpl(CategoryRepository categoryRepo, ModelMapper modelMapper){
+    public CategoryServiceImpl(CategoryRepository categoryRepo, ModelMapper modelMapper, CloudinaryServiceImpl cloudinary){
         this.categoryRepo = categoryRepo;
         this.modelMapper = new ModelMapper();
+        this.cloudinary = cloudinary;
     }
 
 
     @Override
     public CategoryDto addCategory(CategoryDto category) {
-        ServiceCategory categoryEntity = categoryRepo.save(modelMapper.map(category, ServiceCategory.class));
+
+        String imageUrl = this.cloudinary.uploadImage(category.getCategoryImage(), "Categories");
+        ServiceCategory serviceCategory = ServiceCategory.builder().
+                title(category.getTitle()).
+                description(category.getDescription()).
+                categoryImage(imageUrl).
+                build();
+        ServiceCategory categoryEntity = categoryRepo.save(serviceCategory);
         return modelMapper.map(categoryEntity, CategoryDto.class);
     }
 

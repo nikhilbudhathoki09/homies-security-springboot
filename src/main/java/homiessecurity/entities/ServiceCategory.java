@@ -32,7 +32,7 @@ public class ServiceCategory {
 
 
     //TODO: Add image to category
-   // private String categoryImage;
+    private String categoryImage;
     
     
 }

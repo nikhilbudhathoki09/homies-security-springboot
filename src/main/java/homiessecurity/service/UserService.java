@@ -3,6 +3,7 @@ package homiessecurity.service;
 import homiessecurity.dtos.Users.UserDto;
 import homiessecurity.dtos.Users.UserRegisterDto;
 import homiessecurity.entities.User;
+import homiessecurity.payload.ApiResponse;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -20,6 +21,8 @@ public interface UserService {
     List<UserDto> getAllUsers();
 
     int verifyUser(String email);
+
+    ApiResponse deleteUser(Integer userId);
 
 
 }

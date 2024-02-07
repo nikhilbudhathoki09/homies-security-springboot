@@ -4,13 +4,16 @@ import homiessecurity.dtos.Categories.CategoryDto;
 import homiessecurity.entities.ServiceCategory;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
 
@@ -33,7 +36,10 @@ public class CategoryController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<CategoryDto> saveCategory(@RequestBody CategoryDto category){
+    public ResponseEntity<CategoryDto> saveCategory(@Valid @ModelAttribute CategoryDto category,
+                                                    @RequestParam(value = "categoryImage", required = false) MultipartFile file){
+
+        category.setCategoryImage(file);
         CategoryDto savedCategory = this.categoryService.addCategory(category);
         return new ResponseEntity<CategoryDto>(savedCategory, HttpStatus.OK);
     }

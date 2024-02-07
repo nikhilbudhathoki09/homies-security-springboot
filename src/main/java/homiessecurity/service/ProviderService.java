@@ -19,6 +19,8 @@ public interface ProviderService {
 
     public List<ServiceProvider> getAllVerifiedProviders();
 
+    public List<ServiceProvider> getAllApprovedProviders();
+
     public ServiceProvider updateProviderStatus(Integer providerId, String status);
 
     public ServiceProvider getServiceProviderByEmail(String email);

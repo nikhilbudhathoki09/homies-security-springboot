@@ -2,16 +2,14 @@ package homiessecurity.service.impl;
 
 
 import homiessecurity.dtos.Providers.ProviderRegistrationRequestDto;
-import homiessecurity.entities.ProviderStatus;
-import homiessecurity.entities.ServiceCategory;
-import homiessecurity.entities.ServiceProvider;
-import homiessecurity.entities.Services;
+import homiessecurity.entities.*;
 import homiessecurity.exceptions.CustomCommonException;
 import homiessecurity.exceptions.ResourceAlreadyExistsException;
 import homiessecurity.exceptions.ResourceNotFoundException;
 import homiessecurity.repository.ProviderRepository;
 import homiessecurity.service.CategoryService;
 import homiessecurity.service.EmailSenderService;
+import homiessecurity.service.LocationService;
 import homiessecurity.service.ProviderService;
 import jakarta.mail.MessagingException;
 import org.modelmapper.ModelMapper;
@@ -26,17 +24,21 @@ import java.util.List;
 public class ProviderServiceImpl implements ProviderService {
     private final ProviderRepository providerRepo;
     private final CategoryService categoryService;
+
+    private final LocationService locationService;
     private final EmailSenderService emailSender;
     private final ModelMapper modelMapper;
 
 
     @Autowired
     public ProviderServiceImpl(ProviderRepository providerRepo, CategoryService categoryService,
-                               ModelMapper modelMapper,EmailSenderService emailSender){
+                               ModelMapper modelMapper,EmailSenderService emailSender
+                                ,LocationService locationService){
         this.providerRepo = providerRepo;
         this.categoryService = categoryService;
         this.modelMapper = modelMapper;
         this.emailSender = emailSender;
+        this.locationService = locationService;
 
     }
 
@@ -50,12 +52,15 @@ public class ProviderServiceImpl implements ProviderService {
             throw new ResourceAlreadyExistsException("PhoneNumber is already  in use. Try a new one ");
         }
 
+//        Locations location = locationService.getLocationById(register.getLocation());
+
         ServiceProvider provider = ServiceProvider.builder()
                 .providerName(register.getProviderName())
                 .email(register.getEmail())
                 .status(ProviderStatus.PENDING)
                 .phoneNumber(register.getPhoneNumber())
                 .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .password(register.getPassword())
                 .address(register.getAddress())
                 .description(register.getDescription())
@@ -91,6 +96,12 @@ public class ProviderServiceImpl implements ProviderService {
 
     @Override
     public List<ServiceProvider> getAllVerifiedProviders() {
+        return this.providerRepo.findVerifiedProviders()
+                .orElseThrow(() -> new CustomCommonException("No verified providers found"));
+    }
+
+    @Override
+    public List<ServiceProvider> getAllApprovedProviders() {
         return this.providerRepo.findAllByStatus(ProviderStatus.APPROVED)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider", "status", ProviderStatus.APPROVED));
     }

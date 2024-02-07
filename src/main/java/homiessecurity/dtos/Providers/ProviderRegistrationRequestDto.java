@@ -1,6 +1,8 @@
 package homiessecurity.dtos.Providers;
 
 
+import homiessecurity.entities.Locations;
+import homiessecurity.entities.ProviderStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -8,6 +10,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -40,6 +44,14 @@ public class ProviderRegistrationRequestDto {
     @NotBlank(message = "Description cannot be set empty.")
     @Size(min = 10, max = 100, message = "Description must be 10-100 characters")
     private String description;
+
+    private ProviderStatus status;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+
 
 //    @NotBlank(message = "Registration Document cannot be set empty.")
 //    private MultipartFile registrationDocument;

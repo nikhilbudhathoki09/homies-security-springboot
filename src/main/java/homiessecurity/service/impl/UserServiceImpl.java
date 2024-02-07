@@ -7,6 +7,7 @@ import homiessecurity.entities.Role;
 import homiessecurity.entities.User;
 import homiessecurity.exceptions.ResourceAlreadyExistsException;
 import homiessecurity.exceptions.ResourceNotFoundException;
+import homiessecurity.payload.ApiResponse;
 import homiessecurity.repository.RoleRepository;
 import homiessecurity.repository.UserRepository;
 import homiessecurity.service.UserService;
@@ -116,6 +117,14 @@ public class UserServiceImpl implements UserService, UserDetailsService{
         return userRepo.verifyUser(email);
     }
 
+    @Override
+    public ApiResponse deleteUser(Integer userId) {
+        User user = this.userRepo.findById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("User", "userId", userId));
+        this.userRepo.delete(user);
+        return new ApiResponse("User deleted successfully", true);
+    }
+
 
     public UserDto updateUser(UserDto userDto) {
         User user = this.userRepo.findByEmail(userDto.getEmail()).orElseThrow(() ->
@@ -130,24 +139,6 @@ public class UserServiceImpl implements UserService, UserDetailsService{
         User updatedUser = this.userRepo.save(user);
         return this.modelMapper.map(updatedUser, UserDto.class);
     }
-
-    //i need a admin to be created and a function named register admin and provide a role named ROLE_ADMIN
-
-    // public UserDto registerAdmin(UserRegisterDto register) {
-    //     //if the email and phoneNumber already exists then should try a new one
-    //     if(userRepo.existsByEmail(register.getEmail())){
-    //         throw new ResourceAlreadyExistsException("Email already exists. Try a new one");
-    //     }
-    //     if(userRepo.existsByPhoneNumber(register.getPhoneNumber())){
-    //         throw new ResourceAlreadyExistsException("PhoneNumber is already  in use. Try a new one ");
-    //     }
-
-    //     //searching the role from the table if not found creating a role
-    //     Role userRole = roleRepo.findByTitle("ADMIN")
-    //         .orElseGet(() -> roleRepo.save(Role.builder().title("ADMIN").description("Admin User").build()));
-
-
-
 
 
 }

@@ -40,6 +40,7 @@ public class AuthenticationService {
     private final RefreshTokenRepository tokenRepo;
     private final EmailVerificationService emailVerificationService;
     private final EmailSenderService emailSenderService;
+    private final CloudinaryService cloudinary;
 
 
     public ApiResponse registerUser(UserRegisterDto request)  {
@@ -54,11 +55,15 @@ public class AuthenticationService {
         Role userRole = roleRepo.findByTitle("ROLE_USER")
                 .orElseGet(() -> roleRepo.save(Role.builder().title("ROLE_USER").description("Normal User").build()));
 
+        //uploading the image to cloudinary
+        String imageUrl = cloudinary.uploadImage(request.getUserImage(),"UserProfile");
+
         var user = User.builder()
                 .name(request.getUsername())
                 .email(request.getEmail())
                 .email(request.getEmail())
                 .gender(request.getGender())
+                .userImage(imageUrl)
                 .phoneNumber(request.getPhoneNumber())
                 .address(request.getAddress())
                 .isVerified(false)

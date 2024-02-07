@@ -39,6 +39,10 @@ public class UserRegisterDto {
     @NotEmpty(message = "Please select a gender")
     private String gender;
 
+    
+    private MultipartFile userImage;
+
+
 
 
 

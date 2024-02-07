@@ -8,7 +8,6 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class EmailVerificationResponse {
-
     private String otp;
     private String verificationToken;
 }

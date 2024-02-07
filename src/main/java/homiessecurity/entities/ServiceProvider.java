@@ -60,6 +60,9 @@ public class ServiceProvider {
     @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 
+    @Column(name = "is_verified")
+    private boolean isVerified;
+
 
     @OneToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id")
