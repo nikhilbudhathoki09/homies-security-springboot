@@ -13,7 +13,7 @@ public interface CategoryService {
 
     ServiceCategory getCategoryByTitle(String title);
 
-    ServiceCategory updateCategoryById(Integer categoryId, ServiceCategory category);
+    ServiceCategory updateCategoryById(Integer categoryId, CategoryDto category);
 
     List<ServiceCategory> getAllCategories();
 

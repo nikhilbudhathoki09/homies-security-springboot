@@ -37,7 +37,12 @@ public class ServicesServiceImpl implements ServicesService {
         return service;
     }
 
-   
-   
-    
+    @Override
+    public Services addService(Services service, Integer providerId, Integer categoryId) {
+
+
+        return null;
+    }
+
+
 }

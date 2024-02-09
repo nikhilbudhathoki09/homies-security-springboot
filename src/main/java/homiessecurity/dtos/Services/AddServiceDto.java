@@ -19,5 +19,11 @@ public class AddServiceDto {
     private double perHourRate;
 
     private Integer categoryId;
+
+    private Integer providerId;
+
+    private String serviceImage;
+
+
     
 }

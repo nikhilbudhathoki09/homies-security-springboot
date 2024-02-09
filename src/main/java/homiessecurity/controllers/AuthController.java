@@ -16,12 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 @CrossOrigin("*")
 @RequestMapping("/api/v1/auth")
 
-public class authController {
+public class AuthController {
 
     private final AuthenticationService authService;
     private final EmailVerificationService emailService;
 
-    public authController(AuthenticationService authService, EmailVerificationService emailService) {
+    public AuthController(AuthenticationService authService, EmailVerificationService emailService) {
         this.authService = authService;
         this.emailService = emailService;
     }

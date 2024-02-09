@@ -9,6 +9,8 @@ public interface ServicesService {
 
     Services getServiceById(Integer serviceId);
 
+    Services addService(Services service, Integer providerId, Integer categoryId);
+
     
    
 }

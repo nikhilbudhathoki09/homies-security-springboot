@@ -1,6 +1,8 @@
 package homiessecurity.entities;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Null;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ public class ServiceCategory {
 
 
     //TODO: Add image to category
+    @Nullable
     private String categoryImage;
     
     

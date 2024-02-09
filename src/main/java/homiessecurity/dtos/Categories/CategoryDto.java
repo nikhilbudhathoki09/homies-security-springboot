@@ -1,6 +1,7 @@
 package homiessecurity.dtos.Categories;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class CategoryDto {
     @NotEmpty(message = "Description cannot be empty")
     private String description;
 
-
+    @Nullable
     private MultipartFile categoryImage;
 
 

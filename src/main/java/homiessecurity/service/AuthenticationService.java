@@ -3,6 +3,7 @@ package homiessecurity.service;
 import homiessecurity.dtos.Auth.AuthenticationResponse;
 import homiessecurity.dtos.Auth.LoginRequest;
 import homiessecurity.dtos.EmailVerification.EmailVerificationResponse;
+import homiessecurity.dtos.Users.UserDto;
 import homiessecurity.dtos.Users.UserRegisterDto;
 import homiessecurity.entities.Role;
 import homiessecurity.entities.User;
@@ -10,13 +11,13 @@ import homiessecurity.exceptions.CustomAuthenticationException;
 import homiessecurity.exceptions.ResourceAlreadyExistsException;
 import homiessecurity.exceptions.ResourceNotFoundException;
 import homiessecurity.payload.ApiResponse;
-import homiessecurity.repository.RefreshTokenRepository;
 import homiessecurity.repository.RoleRepository;
 import homiessecurity.repository.UserRepository;
 import homiessecurity.security.JwtService;
 import homiessecurity.service.impl.UserServiceImpl;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,10 +35,10 @@ public class AuthenticationService {
 
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final ModelMapper modelMapper;
     private final UserServiceImpl userService;
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
-    private final RefreshTokenRepository tokenRepo;
     private final EmailVerificationService emailVerificationService;
     private final EmailSenderService emailSenderService;
     private final CloudinaryService cloudinary;
@@ -93,10 +94,6 @@ public class AuthenticationService {
             throw new RuntimeException(e);
         }
 
-//        return AuthenticationResponse.builder()
-//                .accessToken(jwtToken)
-//                .build();
-
         return new ApiResponse("User Registered. Please verify your email to proceed.", true);
     }
 
@@ -113,10 +110,12 @@ public class AuthenticationService {
             );
 
             var user = userService.loadUserByUsername(request.getEmail());
+            User newUser = userService.getUserByEmail(request.getEmail());
 
             var jwtToken = jwtService.generateToken(user);
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
+                    .user(modelMapper.map(newUser, UserDto.class))
                     .build();
         } catch (BadCredentialsException e) {
             // Handle bad credentials exception and throw a custom exception with a meaningful message

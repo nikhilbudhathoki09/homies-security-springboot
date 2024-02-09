@@ -31,8 +31,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto addCategory(CategoryDto category) {
+        String imageUrl = null;
+        if(category.getCategoryImage() != null){
+             imageUrl = this.cloudinary.uploadImage(category.getCategoryImage(), "Categories");
+        }
 
-        String imageUrl = this.cloudinary.uploadImage(category.getCategoryImage(), "Categories");
         ServiceCategory serviceCategory = ServiceCategory.builder().
                 title(category.getTitle()).
                 description(category.getDescription()).
@@ -55,10 +58,21 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ServiceCategory updateCategoryById(Integer categoryId, ServiceCategory category) {
-        ServiceCategory existingCategory = categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
-        existingCategory.setTitle(category.getTitle());
-        existingCategory.setDescription(category.getDescription());
+    public ServiceCategory updateCategoryById(Integer categoryId, CategoryDto category) {
+        ServiceCategory existingCategory = categoryRepo.findById(categoryId).orElseThrow(() ->
+                new ResourceNotFoundException("Category", "categoryId", categoryId));
+
+        if(category.getCategoryImage() !=null){
+            String imageUrl = this.cloudinary.uploadImage(category.getCategoryImage(), "Categories");
+            existingCategory.setCategoryImage(imageUrl);
+        }
+        if(category.getTitle() != null){
+            existingCategory.setTitle(category.getTitle());
+        }
+        if(category.getDescription() != null){
+            existingCategory.setDescription(category.getDescription());
+        }
+
         return categoryRepo.save(existingCategory);
     }
 

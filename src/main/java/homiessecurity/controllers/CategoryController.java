@@ -38,14 +38,20 @@ public class CategoryController {
     @PostMapping("/")
     public ResponseEntity<CategoryDto> saveCategory(@Valid @ModelAttribute CategoryDto category,
                                                     @RequestParam(value = "categoryImage", required = false) MultipartFile file){
-
-        category.setCategoryImage(file);
+        if(file != null){
+            category.setCategoryImage(file);
+        }
         CategoryDto savedCategory = this.categoryService.addCategory(category);
         return new ResponseEntity<CategoryDto>(savedCategory, HttpStatus.OK);
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<ServiceCategory> updateCategory(@PathVariable Integer categoryId, @RequestBody ServiceCategory category){
+    public ResponseEntity<ServiceCategory> updateCategory(@PathVariable Integer categoryId, @ModelAttribute CategoryDto category,
+                                                          @RequestParam(value = "categoryImage", required = false) MultipartFile file){
+        if(file != null){
+            category.setCategoryImage(file);
+        }
+
         ServiceCategory updatedCategory = this.categoryService.updateCategoryById(categoryId, category);
         return new ResponseEntity<ServiceCategory>(updatedCategory, HttpStatus.OK);
     }

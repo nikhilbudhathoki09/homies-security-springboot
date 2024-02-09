@@ -24,9 +24,15 @@ public class EmailVerification {
     private LocalDateTime sentAt;
     private LocalDateTime verifiedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+
+//    @JoinColumn(name = "user_id", referencedColumnName = "id")
+//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    User user;
+
+    @JoinColumn(name = "user_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    User user;
+
 
 
 
