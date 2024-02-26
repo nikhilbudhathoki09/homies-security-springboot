@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -18,11 +19,10 @@ public class AddServiceDto {
 
     private double perHourRate;
 
-    private Integer categoryId;
+    private String  categoryName;
 
-    private Integer providerId;
-
-    private String serviceImage;
+//    private Integer providerId;
+    private MultipartFile serviceImage;
 
 
     

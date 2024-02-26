@@ -1,6 +1,7 @@
 package homiessecurity.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -61,14 +62,19 @@ public class User  implements UserDetails {
     @Column(name = "is_verified")
     private boolean isVerified;
 
-
-
-
+    @JsonProperty("is_verified")
+    public boolean isVerified() {
+        return isVerified;
+    }
 
     @ManyToMany(targetEntity = Role.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "userRoles", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "roleId"))
     @JsonManagedReference
     private Set<Role> userRoles;
+
+    @OneToMany(mappedBy = "user")
+    private List<Appointment> appointments = new ArrayList<>();
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

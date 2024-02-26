@@ -31,7 +31,7 @@ public interface ProviderService {
 
     public ServiceProvider addCategoryById(Integer providerId, Integer categoryId);
 
-
+    public void updateService(ServiceProvider provider);
 
 
     

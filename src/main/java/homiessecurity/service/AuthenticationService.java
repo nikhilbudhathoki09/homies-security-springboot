@@ -112,6 +112,10 @@ public class AuthenticationService {
             var user = userService.loadUserByUsername(request.getEmail());
             User newUser = userService.getUserByEmail(request.getEmail());
 
+            if (!newUser.isVerified()) {
+                throw new CustomAuthenticationException("User is not verified. Please verify your email.");
+            }
+
             var jwtToken = jwtService.generateToken(user);
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)

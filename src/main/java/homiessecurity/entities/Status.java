@@ -1,6 +1,6 @@
 package homiessecurity.entities;
 
-public enum ProviderStatus {
+public enum Status {
     PENDING,
     APPROVED,
     REJECTED,

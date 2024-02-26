@@ -5,6 +5,7 @@ import homiessecurity.entities.ServiceCategory;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.service.CategoryService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    @Autowired
     public CategoryController(CategoryService categoryService){
         this.categoryService = categoryService;
     }
@@ -36,13 +38,13 @@ public class CategoryController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<CategoryDto> saveCategory(@Valid @ModelAttribute CategoryDto category,
+    public ResponseEntity<ServiceCategory> saveCategory(@Valid @ModelAttribute CategoryDto category,
                                                     @RequestParam(value = "categoryImage", required = false) MultipartFile file){
         if(file != null){
             category.setCategoryImage(file);
         }
-        CategoryDto savedCategory = this.categoryService.addCategory(category);
-        return new ResponseEntity<CategoryDto>(savedCategory, HttpStatus.OK);
+        ServiceCategory savedCategory = this.categoryService.addCategory(category);
+        return new ResponseEntity<ServiceCategory>(savedCategory, HttpStatus.OK);
     }
 
     @PutMapping("/{categoryId}")
@@ -61,6 +63,12 @@ public class CategoryController {
         this.categoryService.deleteCategoryById(categoryId);
         ApiResponse response = new ApiResponse( "Category Deleted Successfully",true);
         return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/title/{title}")
+    public ResponseEntity<ServiceCategory> getCategoryByTitle(@PathVariable String title){
+        ServiceCategory category = this.categoryService.getCategoryByTitle(title);
+        return new ResponseEntity<ServiceCategory>(category, HttpStatus.OK);
     }
 
 

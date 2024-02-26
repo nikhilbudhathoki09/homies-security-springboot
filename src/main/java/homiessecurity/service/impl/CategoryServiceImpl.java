@@ -30,19 +30,19 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryDto addCategory(CategoryDto category) {
+    public ServiceCategory addCategory(CategoryDto category) {
         String imageUrl = null;
         if(category.getCategoryImage() != null){
              imageUrl = this.cloudinary.uploadImage(category.getCategoryImage(), "Categories");
         }
-
+        System.out.println("Image URL: " + imageUrl);
         ServiceCategory serviceCategory = ServiceCategory.builder().
                 title(category.getTitle()).
                 description(category.getDescription()).
                 categoryImage(imageUrl).
                 build();
         ServiceCategory categoryEntity = categoryRepo.save(serviceCategory);
-        return modelMapper.map(categoryEntity, CategoryDto.class);
+        return categoryEntity;
     }
 
     @Override
@@ -53,7 +53,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ServiceCategory getCategoryByTitle(String title) {
-        ServiceCategory category = categoryRepo.findByTitle(title).orElseThrow(() -> new ResourceNotFoundException("Category", "title", title));
+        ServiceCategory category = categoryRepo.findByTitle(title).orElseThrow(() ->
+                new ResourceNotFoundException("Category", "title", title));
         return category;      
     }
 
@@ -85,6 +86,17 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategoryById(Integer categoryId) {
         ServiceCategory category = categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
         categoryRepo.delete(category);
+    }
+
+    @Override
+    public ServiceCategory getCategoryByName(String name) {
+        return categoryRepo.findByTitle(name).orElseThrow(() ->
+                new ResourceNotFoundException("Category", "name", name));
+    }
+
+    @Override
+    public void updateServices(ServiceCategory category) {
+        categoryRepo.save(category);
     }
 
 

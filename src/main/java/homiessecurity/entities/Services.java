@@ -1,13 +1,17 @@
 package homiessecurity.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
+@Table(name = "services")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
 @Getter
 @Setter
-@Table(name = "services")
 public class Services {
 
     @Id
@@ -19,14 +23,18 @@ public class Services {
     private double perHourRate;
 
     private String  serviceName;
+
+    private String serviceImage;
     
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
+    @JsonBackReference
     private ServiceCategory category;
 
     @ManyToOne
     @JoinColumn(name = "provider_id", referencedColumnName = "id")
+    @JsonBackReference
     private ServiceProvider provider;
 
-    
+
 }

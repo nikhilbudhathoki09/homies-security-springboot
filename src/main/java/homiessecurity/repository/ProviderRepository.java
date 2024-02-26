@@ -1,6 +1,6 @@
 package homiessecurity.repository;
 
-import homiessecurity.entities.ProviderStatus;
+import homiessecurity.entities.Status;
 import homiessecurity.entities.ServiceProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +16,7 @@ public interface  ProviderRepository extends JpaRepository<ServiceProvider, Inte
     Boolean existsByPhoneNumber(String phoneNumber);
     Optional<ServiceProvider> findByEmail(String email);
 
-    Optional<List<ServiceProvider>> findAllByStatus(ProviderStatus status);
+    Optional<List<ServiceProvider>> findAllByStatus(Status status);
 
 //    @Query(value = "SELECT p FROM ServiceProvider p WHERE p.isVerified = true", nativeQuery = true)
 //    Optional<List<ServiceProvider>> findVerifiedProviders();

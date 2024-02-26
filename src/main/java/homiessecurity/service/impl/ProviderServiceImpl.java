@@ -57,7 +57,7 @@ public class ProviderServiceImpl implements ProviderService {
         ServiceProvider provider = ServiceProvider.builder()
                 .providerName(register.getProviderName())
                 .email(register.getEmail())
-                .status(ProviderStatus.PENDING)
+                .status(Status.PENDING)
                 .phoneNumber(register.getPhoneNumber())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -102,14 +102,14 @@ public class ProviderServiceImpl implements ProviderService {
 
     @Override
     public List<ServiceProvider> getAllApprovedProviders() {
-        return this.providerRepo.findAllByStatus(ProviderStatus.APPROVED)
-                .orElseThrow(() -> new ResourceNotFoundException("Provider", "status", ProviderStatus.APPROVED));
+        return this.providerRepo.findAllByStatus(Status.APPROVED)
+                .orElseThrow(() -> new ResourceNotFoundException("Provider", "status", Status.APPROVED));
     }
 
     @Override
     public ServiceProvider updateProviderStatus(Integer providerId, String status) {
         ServiceProvider provider = getServiceProviderById(providerId);
-        provider.setStatus(ProviderStatus.valueOf(status)); //value from the status to the provider
+        provider.setStatus(Status.valueOf(status)); //value from the status to the provider
         provider.setUpdatedAt(LocalDateTime.now());
         providerRepo.save(provider);
         return provider;
@@ -147,14 +147,10 @@ public class ProviderServiceImpl implements ProviderService {
         }
     }
 
+    @Override
+    public void updateService(ServiceProvider provider) {
+        providerRepo.save(provider);
+    }
 
 
-
-
-
-
-
-
-    
-    
 }

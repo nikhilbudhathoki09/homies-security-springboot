@@ -1,8 +1,8 @@
 package homiessecurity.dtos.Providers;
 
 
-import homiessecurity.entities.Locations;
-import homiessecurity.entities.ProviderStatus;
+import homiessecurity.entities.Status;
+import homiessecurity.entities.ServiceCategory;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -45,11 +46,13 @@ public class ProviderRegistrationRequestDto {
     @Size(min = 10, max = 100, message = "Description must be 10-100 characters")
     private String description;
 
-    private ProviderStatus status;
+    private Status status;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private Set<ServiceCategory> allCategories;
 
 
 

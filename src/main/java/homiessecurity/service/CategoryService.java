@@ -3,11 +3,14 @@ package homiessecurity.service;
 
 import homiessecurity.dtos.Categories.CategoryDto;
 import homiessecurity.entities.ServiceCategory;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
+@Service
 public interface CategoryService {
 
-    CategoryDto addCategory(CategoryDto category);
+    ServiceCategory addCategory(CategoryDto category);
 
     ServiceCategory getCategoryById(Integer categoryId);
 
@@ -18,6 +21,10 @@ public interface CategoryService {
     List<ServiceCategory> getAllCategories();
 
     void deleteCategoryById(Integer categoryId);
+
+    ServiceCategory getCategoryByName(String name);
+
+    void updateServices(ServiceCategory category);
 
 
     

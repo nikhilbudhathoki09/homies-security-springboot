@@ -1,5 +1,6 @@
 package homiessecurity.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Null;
@@ -30,6 +31,7 @@ public class ServiceCategory {
     private String description;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Services> allServices = new ArrayList<>();
 
 
