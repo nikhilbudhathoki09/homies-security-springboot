@@ -1,5 +1,7 @@
 package homiessecurity.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Builder
@@ -35,12 +38,19 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "provider_id")
+    @JsonBackReference
     private ServiceProvider provider;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String additionalImage;
+    @ManyToMany(targetEntity = Services.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "appointment_services", joinColumns = @JoinColumn(name = "appointment_id"), inverseJoinColumns = @JoinColumn(name = "service_id"))
+    @JsonManagedReference
+    private List<Services> allServices;
+
+
+//    private String additionalImage;
 
 }

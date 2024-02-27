@@ -2,14 +2,18 @@ package homiessecurity.service;
 
 
 import homiessecurity.dtos.Services.AddServiceDto;
+import homiessecurity.dtos.Services.ServicesDto;
 import homiessecurity.entities.Services;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ServicesService {
     Services getServiceById(Integer serviceId);
 
-    Services addService(AddServiceDto service, Integer providerId);
+    public ServicesDto getServiceDtoById(Integer serviceId);
+
+    ServicesDto addService(AddServiceDto service, Integer providerId);
 
     Services updateService(Integer serviceId, AddServiceDto service);
 
@@ -17,13 +21,15 @@ public interface ServicesService {
 
     Services getServiceByName(String name);
 
-    List<Services> getAllServices();
+    ServicesDto getServiceDtoByName(String name);
 
-    List<Services> getAllServicesByCategory(String category);
+    List<ServicesDto> getAllServices();
 
-    List<Services> getAllServicesByProvider(Integer providerId);
+    List<ServicesDto> getAllServicesByCategory(String category);
 
-    List<Services> getSearchedServices(String search);
+    List<ServicesDto> getAllServicesByProvider(Integer providerId);
+
+    List<ServicesDto> getSearchedServices(String search);
 
 
 

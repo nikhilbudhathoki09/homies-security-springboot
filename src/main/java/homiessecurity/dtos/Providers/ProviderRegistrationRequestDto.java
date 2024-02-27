@@ -3,6 +3,7 @@ package homiessecurity.dtos.Providers;
 
 import homiessecurity.entities.Status;
 import homiessecurity.entities.ServiceCategory;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -10,8 +11,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -46,13 +49,18 @@ public class ProviderRegistrationRequestDto {
     @Size(min = 10, max = 100, message = "Description must be 10-100 characters")
     private String description;
 
-    private Status status;
+    @Nullable
+    private MultipartFile providerImage;
 
-    private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
 
-    private Set<ServiceCategory> allCategories;
+//    private Status status;
+//
+//    private LocalDateTime createdAt;
+//
+//    private LocalDateTime updatedAt;
+//
+//    private List<ServiceCategory> categories;
 
 
 

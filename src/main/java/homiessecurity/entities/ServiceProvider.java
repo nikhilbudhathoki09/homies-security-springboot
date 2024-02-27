@@ -84,6 +84,7 @@ public class ServiceProvider implements UserDetails {
     private List<ServiceCategory> categories = new ArrayList<>(3);  //making the size of the category to 3 so the provider can only choose 3 categories
 
     @OneToMany(mappedBy = "provider")
+    @JsonManagedReference
     private List<Appointment> appointments = new ArrayList<>();
 
 

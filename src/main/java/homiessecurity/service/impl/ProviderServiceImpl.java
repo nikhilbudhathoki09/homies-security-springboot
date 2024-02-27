@@ -1,11 +1,13 @@
 package homiessecurity.service.impl;
 
 
+import homiessecurity.dtos.Providers.ProviderDto;
 import homiessecurity.dtos.Providers.ProviderRegistrationRequestDto;
 import homiessecurity.entities.*;
 import homiessecurity.exceptions.CustomCommonException;
 import homiessecurity.exceptions.ResourceAlreadyExistsException;
 import homiessecurity.exceptions.ResourceNotFoundException;
+import homiessecurity.payload.ApiResponse;
 import homiessecurity.repository.ProviderRepository;
 import homiessecurity.service.CategoryService;
 import homiessecurity.service.EmailSenderService;
@@ -14,6 +16,10 @@ import homiessecurity.service.ProviderService;
 import jakarta.mail.MessagingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +27,7 @@ import java.util.List;
 
 
 @Service
-public class ProviderServiceImpl implements ProviderService {
+public class ProviderServiceImpl implements ProviderService, UserDetailsService {
     private final ProviderRepository providerRepo;
     private final CategoryService categoryService;
 
@@ -29,16 +35,19 @@ public class ProviderServiceImpl implements ProviderService {
     private final EmailSenderService emailSender;
     private final ModelMapper modelMapper;
 
+    private final PasswordEncoder encoder;
+
 
     @Autowired
     public ProviderServiceImpl(ProviderRepository providerRepo, CategoryService categoryService,
                                ModelMapper modelMapper,EmailSenderService emailSender
-                                ,LocationService locationService){
+                                ,LocationService locationService, PasswordEncoder encoder){
         this.providerRepo = providerRepo;
         this.categoryService = categoryService;
         this.modelMapper = modelMapper;
         this.emailSender = emailSender;
         this.locationService = locationService;
+        this.encoder = encoder;
 
     }
 
@@ -61,7 +70,7 @@ public class ProviderServiceImpl implements ProviderService {
                 .phoneNumber(register.getPhoneNumber())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .password(register.getPassword())
+                .password(encoder.encode(register.getPassword()))
                 .address(register.getAddress())
                 .description(register.getDescription())
                 .build();
@@ -82,12 +91,21 @@ public class ProviderServiceImpl implements ProviderService {
     }
 
     @Override
-    public ServiceProvider getServiceProviderById(Integer providerId) {
+    public ProviderDto getServiceProviderById(Integer providerId) {
         ServiceProvider provider = this.providerRepo.findById(providerId).orElseThrow(()-> new ResourceNotFoundException(
             "Provider", "ProviderId", providerId));
 
+        return mapToProviderDto(provider);
+    }
+
+    @Override
+    public ServiceProvider getProviderById(Integer providerId) {
+        ServiceProvider provider = this.providerRepo.findById(providerId).orElseThrow(()-> new ResourceNotFoundException(
+                "Provider", "ProviderId", providerId));
+
         return provider;
     }
+
 
     @Override
     public List<ServiceProvider> getAllProviders() {
@@ -108,7 +126,7 @@ public class ProviderServiceImpl implements ProviderService {
 
     @Override
     public ServiceProvider updateProviderStatus(Integer providerId, String status) {
-        ServiceProvider provider = getServiceProviderById(providerId);
+        ServiceProvider provider = getProviderById(providerId);
         provider.setStatus(Status.valueOf(status)); //value from the status to the provider
         provider.setUpdatedAt(LocalDateTime.now());
         providerRepo.save(provider);
@@ -123,13 +141,13 @@ public class ProviderServiceImpl implements ProviderService {
 
     @Override
     public List<ServiceCategory> getAllCategoriesById(Integer providerId) {
-        ServiceProvider provider = getServiceProviderById(providerId);
+        ServiceProvider provider = getProviderById(providerId);
         return provider.getCategories();
     }
 
     @Override
     public List<Services> getAllServicesById(Integer providerId) {
-        ServiceProvider provider = getServiceProviderById(providerId);
+        ServiceProvider provider = getProviderById(providerId);
         return provider.getAllServices();
     }
 
@@ -140,7 +158,7 @@ public class ProviderServiceImpl implements ProviderService {
             throw new CustomCommonException("You can only choose 3 categories");
         }else{
             ServiceCategory category = categoryService.getCategoryById(categoryId);
-            ServiceProvider provider = getServiceProviderById(providerId);
+            ServiceProvider provider = getProviderById(providerId);
             categories.add(category); 
             provider.setCategories(categories);    
             return providerRepo.save(provider);  
@@ -150,6 +168,53 @@ public class ProviderServiceImpl implements ProviderService {
     @Override
     public void updateService(ServiceProvider provider) {
         providerRepo.save(provider);
+    }
+
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return this.providerRepo.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Provider not found with email: " + email));
+    }
+
+    @Override
+    public ApiResponse deleteProviderById(Integer providerId) {
+        ServiceProvider provider = this.providerRepo.findById(providerId).orElseThrow(() ->
+                new ResourceNotFoundException("Provider", "providerId", providerId));
+        this.providerRepo.delete(provider);
+        return new ApiResponse("Provider deleted successfully", true);
+    }
+
+
+    public static ServiceProvider mapToServiceProvider(ProviderRegistrationRequestDto requestDto) {
+        ServiceProvider serviceProvider = new ServiceProvider();
+        serviceProvider.setProviderName(requestDto.getProviderName());
+        serviceProvider.setEmail(requestDto.getEmail());
+        serviceProvider.setDescription(requestDto.getDescription());
+        serviceProvider.setPhoneNumber(requestDto.getPhoneNumber());
+        serviceProvider.setAddress(requestDto.getAddress());
+        serviceProvider.setPassword(requestDto.getPassword());
+        return serviceProvider;
+    }
+
+    public ProviderDto mapToProviderDto(ServiceProvider serviceProvider) {
+        ProviderDto providerDto = new ProviderDto();
+        providerDto.setProviderId(serviceProvider.getProviderId());
+        providerDto.setProviderName(serviceProvider.getProviderName());
+        providerDto.setEmail(serviceProvider.getEmail());
+        providerDto.setDescription(serviceProvider.getDescription());
+        providerDto.setPhoneNumber(serviceProvider.getPhoneNumber());
+        providerDto.setAddress(serviceProvider.getAddress());
+        providerDto.setStatus(serviceProvider.getStatus().toString());
+        providerDto.setAllServices(serviceProvider.getAllServices());
+        providerDto.setCategories(serviceProvider.getCategories());
+
+        return providerDto;
+    }
+
+    @Override
+    public int verifyProvider(String email) {
+        return providerRepo.verifyProvider(email);
     }
 
 

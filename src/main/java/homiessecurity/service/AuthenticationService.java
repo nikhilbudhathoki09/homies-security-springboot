@@ -3,19 +3,25 @@ package homiessecurity.service;
 import homiessecurity.dtos.Auth.AuthenticationResponse;
 import homiessecurity.dtos.Auth.LoginRequest;
 import homiessecurity.dtos.EmailVerification.EmailVerificationResponse;
+import homiessecurity.dtos.Providers.ProviderDto;
+import homiessecurity.dtos.Providers.ProviderRegistrationRequestDto;
 import homiessecurity.dtos.Users.UserDto;
 import homiessecurity.dtos.Users.UserRegisterDto;
 import homiessecurity.entities.Role;
+import homiessecurity.entities.ServiceProvider;
+import homiessecurity.entities.Status;
 import homiessecurity.entities.User;
 import homiessecurity.exceptions.CustomAuthenticationException;
 import homiessecurity.exceptions.ResourceAlreadyExistsException;
 import homiessecurity.exceptions.ResourceNotFoundException;
 import homiessecurity.payload.ApiResponse;
+import homiessecurity.repository.ProviderRepository;
 import homiessecurity.repository.RoleRepository;
 import homiessecurity.repository.UserRepository;
 import homiessecurity.security.JwtService;
 import homiessecurity.service.impl.UserServiceImpl;
 import jakarta.mail.MessagingException;
+import jakarta.mail.Provider;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,6 +48,8 @@ public class AuthenticationService {
     private final EmailVerificationService emailVerificationService;
     private final EmailSenderService emailSenderService;
     private final CloudinaryService cloudinary;
+    private final ProviderRepository providerRepo;
+    private final ProviderService providerService;
 
 
     public ApiResponse registerUser(UserRegisterDto request)  {
@@ -120,6 +128,80 @@ public class AuthenticationService {
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
                     .user(modelMapper.map(newUser, UserDto.class))
+                    .build();
+        } catch (BadCredentialsException e) {
+            // Handle bad credentials exception and throw a custom exception with a meaningful message
+            throw new CustomAuthenticationException("Invalid credentials. Please check your email and password.");
+        }
+    }
+
+
+    public ProviderDto registerProvider(ProviderRegistrationRequestDto register) {
+        if(providerRepo.existsByEmail(register.getEmail())){
+            throw new ResourceAlreadyExistsException("Email already exists. Try a new one");
+        }
+
+        if(providerRepo.existsByPhoneNumber(register.getPhoneNumber())){
+            throw new ResourceAlreadyExistsException("PhoneNumber is already  in use. Try a new one ");
+        }
+
+//        Locations location = locationService.getLocationById(register.getLocation());
+
+        ServiceProvider provider = ServiceProvider.builder()
+                .providerName(register.getProviderName())
+                .email(register.getEmail())
+                .status(Status.PENDING)
+                .phoneNumber(register.getPhoneNumber())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .password(passwordEncoder.encode(register.getPassword()))
+                .address(register.getAddress())
+                .description(register.getDescription())
+                .build();
+
+        ServiceProvider requestedProvider = providerRepo.save(provider);
+        var jwtToken = jwtService.generateToken(requestedProvider);
+        EmailVerificationResponse emailResponse = emailVerificationService.getEmailVerification(requestedProvider);
+        try {
+                emailSenderService.sendProviderVerificationEmail(requestedProvider.getEmail(),
+                        requestedProvider.getProviderName(),
+                        "Verify your email"
+                        , emailResponse.getVerificationToken());
+            } catch (MessagingException e) {
+                System.out.println("Error sending email");
+                throw new RuntimeException(e);
+            }
+
+        return providerService.mapToProviderDto(requestedProvider);
+
+    }
+
+
+    public AuthenticationResponse authenticateProvider(LoginRequest request) {
+        try {
+            if (!providerRepo.existsByEmail(request.getEmail())) {
+                throw new ResourceNotFoundException("Provider", "email", request.getEmail());
+            }
+            var providerCheck = providerService.getServiceProviderByEmail(request.getEmail());
+            System.out.println(providerCheck);
+
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword())
+            );
+
+            var provider = providerService.loadUserByUsername(request.getEmail());
+            ServiceProvider newProvider = providerService.getServiceProviderByEmail(request.getEmail());
+
+            if (!newProvider.isVerified()) {
+                throw new CustomAuthenticationException("Provider is not verified. Please verify your email.");
+            }
+
+            var jwtToken = jwtService.generateToken(provider);
+            return AuthenticationResponse.builder()
+                    .accessToken(jwtToken)
+                    .provider(newProvider)
                     .build();
         } catch (BadCredentialsException e) {
             // Handle bad credentials exception and throw a custom exception with a meaningful message

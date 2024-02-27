@@ -2,6 +2,8 @@ package homiessecurity.controllers;
 
 import homiessecurity.dtos.Auth.AuthenticationResponse;
 import homiessecurity.dtos.Auth.LoginRequest;
+import homiessecurity.dtos.Providers.ProviderDto;
+import homiessecurity.dtos.Providers.ProviderRegistrationRequestDto;
 import homiessecurity.dtos.Users.UserRegisterDto;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.service.AuthenticationService;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.security.Provider;
 
 @RestController
 @CrossOrigin("*")
@@ -44,6 +48,25 @@ public class AuthController {
     @GetMapping (value = "/verify")
     public ResponseEntity<String>verifyUser(@RequestParam String token){
         return new ResponseEntity<String>(emailService.confirmToken(token), HttpStatus.OK);
+    }
+
+    @PostMapping("/providers/login")
+    public ResponseEntity<AuthenticationResponse> providerLogin(@Valid@RequestBody LoginRequest request){
+        AuthenticationResponse response = this.authService.authenticateProvider(request);
+        return new ResponseEntity<AuthenticationResponse>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/providers/register")
+    public ResponseEntity<ProviderDto> registerProvider(@Valid @ModelAttribute ProviderRegistrationRequestDto register,
+                                                        @RequestParam(value = "providerImage", required = false) MultipartFile file){
+        register.setProviderImage(file);
+        ProviderDto provider = this.authService.registerProvider(register);
+        return new ResponseEntity<ProviderDto>(provider, HttpStatus.CREATED);
+    }
+
+    @GetMapping(value="/providers/verify")
+    public ResponseEntity<ApiResponse> verifyProvider(@RequestParam String token){
+        return new ResponseEntity<ApiResponse>(emailService.confirmProviderToken(token), HttpStatus.OK);
     }
 
 

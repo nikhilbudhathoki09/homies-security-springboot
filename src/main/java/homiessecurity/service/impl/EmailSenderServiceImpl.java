@@ -69,11 +69,34 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         helper.setTo(toEmail);
         helper.setText(text, true);
         mailSender.send(message);
+    }
+
+    public void sendProviderVerificationEmail(String toEmail, String name, String subject, String  token) throws MessagingException {
+
+        Context context = new Context();
+        context.setVariables(Map.of("name",name , "verificationUrl", getProviderVerificationUrl(token)));
+        String text = templateEngine.process("verificationEmail", context);
+        MimeMessage message = getMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setPriority(1);
+        helper.setSubject(subject);
+        helper.setFrom("nikhilbudhathoki0@gmail.com");
+        helper.setTo(toEmail);
+        helper.setText(text, true);
+        mailSender.send(message);
         System.out.println("Mail sent sucessfully");
     }
 
+
+
     public String getVerificationUrl(String token){
         String url = "http://localhost:8000/api/v1/auth/verify?token=" + token;
+        System.out.println(url);
+        return url;
+    }
+
+    public String getProviderVerificationUrl(String token){
+        String url = "http://localhost:8000/api/v1/auth/providers/verify?token=" + token;
         System.out.println(url);
         return url;
     }

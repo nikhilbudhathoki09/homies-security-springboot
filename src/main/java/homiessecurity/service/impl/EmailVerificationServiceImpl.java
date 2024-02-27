@@ -3,9 +3,12 @@ package homiessecurity.service.impl;
 
 import homiessecurity.dtos.EmailVerification.EmailVerificationResponse;
 import homiessecurity.entities.EmailVerification;
+import homiessecurity.entities.ServiceProvider;
 import homiessecurity.entities.User;
+import homiessecurity.payload.ApiResponse;
 import homiessecurity.repository.EmailVerificationRepository;
 import homiessecurity.service.EmailVerificationService;
+import homiessecurity.service.ProviderService;
 import homiessecurity.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,13 +25,15 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     private final EmailVerificationRepository emailVerificationRepo;
     private final PasswordEncoder encoder;
-
     private final UserService userService;
+    private final ProviderService providerService;
 
-    public EmailVerificationServiceImpl(EmailVerificationRepository emailVerificationRepo, PasswordEncoder encoder, UserService userService) {
+    public EmailVerificationServiceImpl(EmailVerificationRepository emailVerificationRepo, PasswordEncoder encoder,
+                                        UserService userService, ProviderService providerService) {
         this.emailVerificationRepo = emailVerificationRepo;
         this.encoder = encoder;
         this.userService = userService;
+        this.providerService = providerService;
     }
 
     @Override
@@ -43,6 +48,27 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                 .sentAt(LocalDateTime.now())
                 .verificationToken(verificationToken)
                 .user(user)
+                .build();
+
+        emailVerificationRepo.save(emailVerification); //saving the otp and verification token in the database
+        return EmailVerificationResponse.builder()
+                .otp(otp)
+                .verificationToken(verificationToken)
+                .build();
+    }
+
+    @Override
+    public EmailVerificationResponse getEmailVerification(ServiceProvider provider) {
+        Random random = new Random();
+        String otp = String.valueOf(random.nextInt(99999));
+
+        String verificationToken = String.valueOf(UUID.randomUUID());
+
+        EmailVerification emailVerification = EmailVerification.builder()
+                .otp(encoder.encode(otp))
+                .sentAt(LocalDateTime.now())
+                .verificationToken(verificationToken)
+                .provider(provider)
                 .build();
 
         emailVerificationRepo.save(emailVerification); //saving the otp and verification token in the database
@@ -97,5 +123,23 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
         //Returning confirmation message if the token matches
         return "Your email is confirmed. Thank you for using our service!";
+    }
+
+    @Transactional
+    public ApiResponse confirmProviderToken(String token){
+        EmailVerification confirmToken = emailVerificationRepo.findByVerificationToken(token)
+                .orElseThrow(() -> new IllegalStateException("Invalid verification token"));
+
+        if (confirmToken.getVerifiedAt() != null) {
+            throw new IllegalStateException("Email is already confirmed");
+        }
+        if (LocalDateTime.now().isAfter(confirmToken.getSentAt().plusMinutes(5))) {
+            throw new IllegalStateException("Token is already expired");
+        }
+
+        confirmToken.setVerifiedAt(LocalDateTime.now());
+        providerService.verifyProvider(confirmToken.getProvider().getEmail()); //verifying the email of the provider
+
+        return new ApiResponse("Your email is confirmed. Thank you for using our service!", true);
     }
 }

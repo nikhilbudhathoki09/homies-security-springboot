@@ -2,6 +2,7 @@ package homiessecurity.dtos.Auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import homiessecurity.dtos.Users.UserDto;
+import homiessecurity.entities.ServiceProvider;
 import homiessecurity.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,8 @@ public class AuthenticationResponse {
 
 
     private UserDto user;
+
+    private ServiceProvider provider;
 
 
 

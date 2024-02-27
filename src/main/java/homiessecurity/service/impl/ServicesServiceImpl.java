@@ -2,6 +2,7 @@ package homiessecurity.service.impl;
 
 
 import homiessecurity.dtos.Services.AddServiceDto;
+import homiessecurity.dtos.Services.ServicesDto;
 import homiessecurity.entities.ServiceCategory;
 import homiessecurity.entities.ServiceProvider;
 import homiessecurity.entities.Services;
@@ -39,6 +40,13 @@ public class ServicesServiceImpl implements ServicesService {
     }   
 
     @Override
+    public ServicesDto getServiceDtoById(Integer serviceId) {
+        Services service = servicesRepo.findById(serviceId).orElseThrow(() ->
+                new ResourceNotFoundException("Service", "serviceId", serviceId));
+        return this.modelMapper.map(service, ServicesDto.class);
+    }
+
+    @Override
     public Services getServiceById(Integer serviceId) {
         Services service = servicesRepo.findById(serviceId).orElseThrow(() ->
                 new ResourceNotFoundException("Service", "serviceId", serviceId));
@@ -46,8 +54,8 @@ public class ServicesServiceImpl implements ServicesService {
     }
 
     @Override
-    public Services addService(AddServiceDto service, Integer providerId) {
-        ServiceProvider provider = providerService.getServiceProviderById(providerId);
+    public ServicesDto addService(AddServiceDto service, Integer providerId) {
+        ServiceProvider provider = providerService.getProviderById(providerId);
         ServiceCategory category = categoryService.getCategoryByTitle(service.getCategoryName());
 
         String serviceImage = null;
@@ -67,7 +75,7 @@ public class ServicesServiceImpl implements ServicesService {
         //also updating the provider and services collections
         provider.getAllServices().add(newService);
         category.getAllServices().add(newService);
-        return servicesRepo.save(newService);
+        return this.modelMapper.map(servicesRepo.save(newService), ServicesDto.class);
     }
 
     @Override
@@ -83,8 +91,12 @@ public class ServicesServiceImpl implements ServicesService {
         if(Double.isNaN(service.getPerHourRate())){
             services.setPerHourRate(service.getPerHourRate());
         }
-
+        if(service.getServiceImage() != null){
+            String serviceImage = cloudinaryService.uploadImage(service.getServiceImage(), "Services");
+            services.setServiceImage(serviceImage);
+        }
         return servicesRepo.save(services);
+
     }
 
     @Override
@@ -100,26 +112,47 @@ public class ServicesServiceImpl implements ServicesService {
     }
 
     @Override
-    public List<Services> getAllServices() {
-        return servicesRepo.findAll();
+    public ServicesDto getServiceDtoByName(String name) {
+        return this.modelMapper.map(getServiceByName(name), ServicesDto.class);
     }
 
     @Override
-    public List<Services> getAllServicesByCategory(String category) {
-        return servicesRepo.findByCategoryTitle(category).orElseThrow(() ->
+    public List<ServicesDto> getAllServices() {
+        List<Services> allServices = servicesRepo.findAll();
+        List<ServicesDto> allServicesDto = allServices.stream().map(service ->
+                modelMapper.map(service, ServicesDto.class)).toList();
+        return allServicesDto;
+    }
+
+    @Override
+    public List<ServicesDto> getAllServicesByCategory(String category) {
+        List<Services> allServices = servicesRepo.findByCategoryTitle(category).orElseThrow(() ->
                 new ResourceNotFoundException("Service", "category", category));
+
+        List<ServicesDto> allServicesDto = allServices.stream().map(service ->
+                modelMapper.map(service, ServicesDto.class)).toList();
+
+        return allServicesDto;
     }
 
     @Override
-    public List<Services> getAllServicesByProvider(Integer providerId) {
-        return servicesRepo.findByProviderId(providerId).orElseThrow(() ->
+    public List<ServicesDto> getAllServicesByProvider(Integer providerId) {
+        List<Services> allServices =  servicesRepo.findByProviderId(providerId).orElseThrow(() ->
                 new ResourceNotFoundException("Service", "providerId", providerId));
+
+        List<ServicesDto> allServicesDto = allServices.stream().map(service ->
+                modelMapper.map(service, ServicesDto.class)).toList();
+        return allServicesDto;
     }
 
     @Override
-    public List<Services> getSearchedServices(String search) {
-        return servicesRepo.findByServiceNameContainingIgnoreCase(search).orElseThrow(() ->
+    public List<ServicesDto> getSearchedServices(String search) {
+        List<Services> searchedServices =  servicesRepo.findByServiceNameContainingIgnoreCase(search).orElseThrow(() ->
                 new ResourceNotFoundException("Service", "search", search));
+
+        List<ServicesDto> searchedServicesDto = searchedServices.stream().map(service ->
+                modelMapper.map(service, ServicesDto.class)).toList();
+        return searchedServicesDto;
     }
 
 
