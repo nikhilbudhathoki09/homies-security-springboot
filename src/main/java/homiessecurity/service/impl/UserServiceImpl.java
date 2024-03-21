@@ -125,6 +125,12 @@ public class UserServiceImpl implements UserService, UserDetailsService{
         return new ApiResponse("User deleted successfully", true);
     }
 
+    @Override
+    public User getRawUserById(Integer userId) {
+        return this.userRepo.findById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("User", "userId", userId));
+    }
+
 
     public UserDto updateUser(UserDto userDto) {
         User user = this.userRepo.findByEmail(userDto.getEmail()).orElseThrow(() ->

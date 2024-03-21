@@ -68,6 +68,9 @@ public class ServiceProvider implements UserDetails {
     @Column(name = "is_verified")
     private boolean isVerified;
 
+    @Column(name = "subscription_token")
+    private String subscriptionToken;
+
 
     @OneToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id")
@@ -83,9 +86,13 @@ public class ServiceProvider implements UserDetails {
                inverseJoinColumns = @JoinColumn(name = "category_id"))
     private List<ServiceCategory> categories = new ArrayList<>(3);  //making the size of the category to 3 so the provider can only choose 3 categories
 
-    @OneToMany(mappedBy = "provider")
+    @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Appointment> appointments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Rating> ratings = new ArrayList<>();
 
 
     @Override

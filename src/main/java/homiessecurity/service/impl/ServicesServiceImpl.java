@@ -155,7 +155,30 @@ public class ServicesServiceImpl implements ServicesService {
         return searchedServicesDto;
     }
 
+    @Override
+    public List<ServicesDto> filterServicesByCategory(String category) {
+        return null;
+    }
 
+    @Override
+    public List<ServicesDto> getTopRatedServices() {
+        return null;
+    }
+
+    @Override
+    public List<ServicesDto> getTopRatedServicesByCategory(String category) {
+        return null;
+    }
+
+    @Override
+    public List<ServicesDto> getServicesByPriceRange(Double min, Double max) {
+        return null;
+    }
+
+    @Override
+    public List<ServicesDto> getServicesByProviderName(String name) {
+        return null;
+    }
 
 
 }

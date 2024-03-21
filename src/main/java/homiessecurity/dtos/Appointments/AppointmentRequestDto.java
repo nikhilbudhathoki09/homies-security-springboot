@@ -15,4 +15,7 @@ public class AppointmentRequestDto {
     private String arrivalTime;
     private LocalDateTime arrivalDate;
     private Integer providerId;
+
+    //TODO: appointment images
+    //private String appointmentImage;
 }

@@ -69,7 +69,4 @@ public class AuthController {
         return new ResponseEntity<ApiResponse>(emailService.confirmProviderToken(token), HttpStatus.OK);
     }
 
-
-
-
 }

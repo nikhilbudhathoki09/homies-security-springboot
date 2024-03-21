@@ -1,8 +1,11 @@
 package homiessecurity.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "services")
@@ -35,6 +38,10 @@ public class Services {
     @JoinColumn(name = "provider_id", referencedColumnName = "id")
     @JsonBackReference
     private ServiceProvider provider;
+
+    @OneToMany(mappedBy = "service")
+    @JsonBackReference
+    private List<Appointment> appointments;
 
 
 }

@@ -24,5 +24,7 @@ public interface UserService {
 
     ApiResponse deleteUser(Integer userId);
 
+    User getRawUserById(Integer userId);
+
 
 }

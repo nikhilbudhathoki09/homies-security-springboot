@@ -26,7 +26,9 @@ public class Appointment {
 
     private String appointmentImage;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 
     private LocalDateTime createdAt;
 
@@ -36,6 +38,8 @@ public class Appointment {
 
     private String arrivalTime;
 
+
+
     @ManyToOne
     @JoinColumn(name = "provider_id")
     @JsonBackReference
@@ -43,12 +47,18 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
-    @ManyToMany(targetEntity = Services.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "appointment_services", joinColumns = @JoinColumn(name = "appointment_id"), inverseJoinColumns = @JoinColumn(name = "service_id"))
-    @JsonManagedReference
-    private List<Services> allServices;
+//    @ManyToMany(targetEntity = Services.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinTable(name = "appointment_services", joinColumns = @JoinColumn(name = "appointment_id"), inverseJoinColumns = @JoinColumn(name = "service_id"))
+//    @JsonManagedReference
+//    private List<Services> allServices;
+
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    @JsonBackReference
+    private Services service;
 
 
 //    private String additionalImage;

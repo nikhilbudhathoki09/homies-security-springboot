@@ -111,5 +111,21 @@ public class ProviderController {
         return new ResponseEntity<>(services, HttpStatus.OK);
     }
 
+    @PutMapping("/services/{serviceId}")
+    public ResponseEntity<Services> updateService(@PathVariable Integer serviceId, @RequestBody AddServiceDto services,
+                                                  @RequestParam(value = "serviceImage", required = false) MultipartFile file) {
+        if(file != null){
+            services.setServiceImage(file);
+        }
+        Services updatedService = servicesService.updateService(serviceId, services);
+        return new ResponseEntity<>(updatedService, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/services/{serviceId}")
+    public ResponseEntity<String> deleteService(@PathVariable Integer serviceId) {
+        servicesService.deleteService(serviceId);
+        return new ResponseEntity<>("Service deleted successfully", HttpStatus.OK);
+    }
+
 
 }

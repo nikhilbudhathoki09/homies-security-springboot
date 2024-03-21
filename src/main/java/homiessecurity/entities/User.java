@@ -72,8 +72,13 @@ public class User  implements UserDetails {
     @JsonManagedReference
     private Set<Role> userRoles;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Appointment> appointments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Rating> ratings = new ArrayList<>();
 
 
     @Override

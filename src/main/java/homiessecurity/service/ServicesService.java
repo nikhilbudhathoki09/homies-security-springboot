@@ -31,6 +31,18 @@ public interface ServicesService {
 
     List<ServicesDto> getSearchedServices(String search);
 
+    List<ServicesDto> filterServicesByCategory(String category);
+
+    List<ServicesDto> getTopRatedServices();
+
+    List<ServicesDto> getTopRatedServicesByCategory(String category);
+
+    List<ServicesDto> getServicesByPriceRange(Double min, Double max);
+
+    List<ServicesDto> getServicesByProviderName(String name);
+
+
+
 
 
 
