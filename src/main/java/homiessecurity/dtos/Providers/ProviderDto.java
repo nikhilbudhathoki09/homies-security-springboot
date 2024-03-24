@@ -25,6 +25,6 @@ public class ProviderDto {
     private String status;
 
     private List<Services> allServices;
-    private List<ServiceCategory> categories;
+    private ServiceCategory categories;
 
 }

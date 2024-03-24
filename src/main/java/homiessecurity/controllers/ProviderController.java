@@ -127,5 +127,25 @@ public class ProviderController {
         return new ResponseEntity<>("Service deleted successfully", HttpStatus.OK);
     }
 
+//    @GetMapping("/{providerId}/suggestions")
+//    public ResponseEntity<List<ServiceProvider>> getSuggestedProviders(@PathVariable Integer providerId) {
+//        ServiceProvider provider = providerService.getRawProviderById(providerId);
+//        List<ServiceProvider> suggestedProviders = providerService.getSuggestedProviders(provider);
+//        return new ResponseEntity<>(suggestedProviders, HttpStatus.OK);
+//    }
+
+    @GetMapping("/{providerId}/suggestions")
+    public ResponseEntity<List<ServiceProvider>> getSuggestedProviders(@PathVariable Integer providerId) {
+        List<Integer> suggestedProviderIds = providerService.getSuggestedProviderIds(providerId);
+        System.out.println("Suggested Provider IDs:");
+        for (Integer id : suggestedProviderIds) {
+            System.out.println(id);
+        }
+        List<ServiceProvider> suggestedProviders = providerService.getProvidersByIds(suggestedProviderIds);
+        return new ResponseEntity<>(suggestedProviders, HttpStatus.OK);
+    }
+
+
+
 
 }

@@ -16,14 +16,22 @@ import homiessecurity.service.ProviderService;
 import jakarta.mail.MessagingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.RestTemplate;
+
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -36,6 +44,9 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
     private final ModelMapper modelMapper;
 
     private final PasswordEncoder encoder;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
 
     @Autowired
@@ -139,11 +150,10 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
                 new ResourceNotFoundException("Provider", "email", email));
     }
 
-    @Override
-    public List<ServiceCategory> getAllCategoriesById(Integer providerId) {
-        ServiceProvider provider = getProviderById(providerId);
-        return provider.getCategories();
-    }
+
+
+
+
 
     @Override
     public List<Services> getAllServicesById(Integer providerId) {
@@ -151,19 +161,7 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
         return provider.getAllServices();
     }
 
-    @Override
-    public ServiceProvider addCategoryById(Integer providerId, Integer categoryId) {
-        List<ServiceCategory> categories = getAllCategoriesById(providerId);
-        if(categories.size() >= 3){
-            throw new CustomCommonException("You can only choose 3 categories");
-        }else{
-            ServiceCategory category = categoryService.getCategoryById(categoryId);
-            ServiceProvider provider = getProviderById(providerId);
-            categories.add(category); 
-            provider.setCategories(categories);    
-            return providerRepo.save(provider);  
-        }
-    }
+
 
     @Override
     public void updateService(ServiceProvider provider) {
@@ -207,7 +205,7 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
         providerDto.setAddress(serviceProvider.getAddress());
         providerDto.setStatus(serviceProvider.getStatus().toString());
         providerDto.setAllServices(serviceProvider.getAllServices());
-        providerDto.setCategories(serviceProvider.getCategories());
+        providerDto.setCategories(serviceProvider.getCategory());
 
         return providerDto;
     }
@@ -215,6 +213,44 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
     @Override
     public int verifyProvider(String email) {
         return providerRepo.verifyProvider(email);
+    }
+
+    @Override
+    public ServiceProvider getRawProviderById(Integer providerId) {
+        return providerRepo.findById(providerId).orElseThrow(() ->
+                new ResourceNotFoundException("Provider", "providerId", providerId));
+    }
+
+    @Override
+    public String getCategoryNameById(Integer providerId) {
+        ServiceProvider provider = getProviderById(providerId);
+        ServiceCategory category = provider.getCategory();
+        return category != null ? category.getTitle().toLowerCase() : null;
+    }
+
+    public List<ServiceProvider> getProvidersByIds(List<Integer> providerIds) {
+        // Use your repository to fetch provider objects by IDs
+        return providerRepo.findAllById(providerIds);
+    }
+
+
+    public List<Integer> getSuggestedProviderIds(Integer providerId) {
+        String flaskServiceUrl = "http://127.0.0.1:5000/suggest-providers";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>("{\"providerId\":" + providerId + "}", headers);
+
+        // Adjusted to expect a response as a Map
+        ResponseEntity<Map<String, List<Integer>>> response = restTemplate.exchange(
+                flaskServiceUrl,
+                HttpMethod.POST,
+                entity,
+                new ParameterizedTypeReference<Map<String, List<Integer>>>() {}
+        );
+
+        // Extract the list of suggested provider IDs from the response map
+        List<Integer> suggestedProviderIds = response.getBody().get("suggested_provider_ids");
+        return suggestedProviderIds;
     }
 
 

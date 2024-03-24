@@ -10,6 +10,7 @@ import homiessecurity.payload.ApiResponse;
 import homiessecurity.repository.AppointmentRepository;
 import homiessecurity.service.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final CloudinaryService cloudinaryService;
     private final EmailSenderService emailSenderService;
 
+    @Autowired
     public AppointmentServiceImpl(ProviderService providerService, UserService userService,
                                   AppointmentRepository appointmentRepository, ModelMapper modelMapper,
                                   CloudinaryService cloudinaryService,ServicesService servicesService,

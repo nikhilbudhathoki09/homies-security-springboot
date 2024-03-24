@@ -1,5 +1,6 @@
 package homiessecurity.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -75,16 +76,33 @@ public class ServiceProvider implements UserDetails {
     @OneToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Locations location;
-    
+
+
+    private double yearOfExperience;
+
+    @Column(name = "min_service_price")
+    private double minServicePrice;
+
+    @Column(name = "max_service_price")
+    private double maxServicePrice;
+
+    @Column(name = "average_rating")
+    private Double averageRating;
+
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Services> allServices = new ArrayList<>();
 
 
-    @ManyToMany
-    @JoinTable(name = "provider_categories", joinColumns = @JoinColumn(name= "provider_id"),
-               inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<ServiceCategory> categories = new ArrayList<>(3);  //making the size of the category to 3 so the provider can only choose 3 categories
+//    @ManyToMany
+//    @JoinTable(name = "provider_categories", joinColumns = @JoinColumn(name= "provider_id"),
+//               inverseJoinColumns = @JoinColumn(name = "category_id"))
+//    private List<ServiceCategory> categories = new ArrayList<>(1);  //making the size of the category to 3 so the provider can only choose 3 categories
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    @JsonBackReference
+    private ServiceCategory category;
 
     @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference

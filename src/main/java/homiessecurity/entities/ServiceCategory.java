@@ -34,6 +34,12 @@ public class ServiceCategory {
     @JsonManagedReference
     private List<Services> allServices = new ArrayList<>();
 
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ServiceProvider> allProviders = new ArrayList<>();
+
+
+
 
     //TODO: Add image to category
     @Nullable
