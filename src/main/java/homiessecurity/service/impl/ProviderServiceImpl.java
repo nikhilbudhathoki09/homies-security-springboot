@@ -10,10 +10,7 @@ import homiessecurity.exceptions.ResourceAlreadyExistsException;
 import homiessecurity.exceptions.ResourceNotFoundException;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.repository.ProviderRepository;
-import homiessecurity.service.CategoryService;
-import homiessecurity.service.EmailSenderService;
-import homiessecurity.service.LocationService;
-import homiessecurity.service.ProviderService;
+import homiessecurity.service.*;
 import jakarta.mail.MessagingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,60 +47,26 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
     @Autowired
     private RestTemplate restTemplate;
 
+    private CloudinaryService cloudinaryService;
+
 
     @Autowired
     public ProviderServiceImpl(ProviderRepository providerRepo, CategoryService categoryService,
                                ModelMapper modelMapper,EmailSenderService emailSender
-                                ,LocationService locationService, PasswordEncoder encoder){
+                                ,LocationService locationService,CloudinaryService cloudinaryService,
+                               PasswordEncoder encoder){
         this.providerRepo = providerRepo;
         this.categoryService = categoryService;
         this.modelMapper = modelMapper;
         this.emailSender = emailSender;
         this.locationService = locationService;
         this.encoder = encoder;
-
+        this.cloudinaryService = cloudinaryService;
     }
 
-    @Override
-    public ProviderRegistrationRequestDto registerServiceProvider(ProviderRegistrationRequestDto register) {
-        if(providerRepo.existsByEmail(register.getEmail())){
-            throw new ResourceAlreadyExistsException("Email already exists. Try a new one");
-        }
-
-        if(providerRepo.existsByPhoneNumber(register.getPhoneNumber())){
-            throw new ResourceAlreadyExistsException("PhoneNumber is already  in use. Try a new one ");
-        }
-
-//        Locations location = locationService.getLocationById(register.getLocation());
-
-        ServiceProvider provider = ServiceProvider.builder()
-                .providerName(register.getProviderName())
-                .email(register.getEmail())
-                .status(Status.PENDING)
-                .phoneNumber(register.getPhoneNumber())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .password(encoder.encode(register.getPassword()))
-                .address(register.getAddress())
-                .description(register.getDescription())
-                .build();
-
-        ServiceProvider requestedProvider = providerRepo.save(provider);
-        if(requestedProvider !=null){
-            try {
-                emailSender.sendHtmlEmail(requestedProvider.getEmail(), requestedProvider.getProviderName(),"Welcome to Homiess");
-            } catch (MessagingException e) {
-                System.out.println("Error sending email");
-                throw new RuntimeException(e);
-            }
-
-        }
-
-        return modelMapper.map(requestedProvider, ProviderRegistrationRequestDto.class);
-        
-    }
 
     public ProviderDto updateServiceProvider(int providerId, UpdateProviderRequestDto updateDto) {
+        String imageUrl = null;
         ServiceProvider provider = getProviderById(providerId);
 
         // Update the fields
@@ -119,23 +82,34 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
         if (updateDto.getAddress() != null) {
             provider.setAddress(updateDto.getAddress());
         }
-        if (updateDto.getYearOfExperience() > 0) {
+        if (updateDto.getYearOfExperience() != null) {
             provider.setYearOfExperience(updateDto.getYearOfExperience());
         }
-        if (updateDto.getMinServicePrice() >= 0) { // Assuming 0 is a valid price, adjust as necessary
+        if (updateDto.getMinServicePrice() != null) {
             provider.setMinServicePrice(updateDto.getMinServicePrice());
         }
-        if (updateDto.getMaxServicePrice() >= 0) { // Assuming 0 is a valid price, adjust as necessary
+        if (updateDto.getMaxServicePrice() != null) {
             provider.setMaxServicePrice(updateDto.getMaxServicePrice());
         }
 
+        if(updateDto.getCategoryId() != null){
+            provider.setCategory(categoryService.getCategoryById(updateDto.getCategoryId()));
+        }
 
-        provider.setUpdatedAt(LocalDateTime.now()); // Update the 'updatedAt' field to the current time
+        if(updateDto.getLocationId() != null){
+            provider.setLocation(locationService.getLocationById(updateDto.getLocationId()));
+        }
 
+        if(updateDto.getProviderImage() != null){
+            imageUrl = cloudinaryService.uploadImage(updateDto.getProviderImage(), "ProviderImages");
+            provider.setProviderImage(imageUrl);
+        }
+
+
+        provider.setUpdatedAt(LocalDateTime.now());
         ServiceProvider updatedProvider = providerRepo.save(provider);
-
-        // Convert the updated provider entity to a DTO to return. Assuming you have a modelMapper or similar mapping utility.
         return modelMapper.map(updatedProvider, ProviderDto.class);
+
     }
 
 
@@ -182,11 +156,32 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
     @Override
     public ServiceProvider updateProviderStatus(Integer providerId, String status) {
         ServiceProvider provider = getProviderById(providerId);
-        provider.setStatus(Status.valueOf(status)); //value from the status to the provider
+        Status newStatus;
+
+        try {
+            newStatus = Status.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid status: " + status);
+        }
+
+        provider.setStatus(newStatus);
         provider.setUpdatedAt(LocalDateTime.now());
         providerRepo.save(provider);
+
+        String subject = switch (newStatus) {
+            case APPROVED -> "Service Provider Registration Approved 🎉";
+            case REJECTED -> "Service Provider Registration Rejected 😞";
+            default -> "Service Provider Registration Update";
+        };
+        try {
+            emailSender.sendStatusChangeEmail(provider.getEmail(), provider.getProviderName(), newStatus, subject);
+        } catch (MessagingException e) {
+            throw new CustomCommonException(e.getMessage());
+        }
         return provider;
     }
+
+
 
     @Override
     public ServiceProvider getServiceProviderByEmail(String email) {
@@ -242,8 +237,11 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
         providerDto.setAddress(serviceProvider.getAddress());
         providerDto.setStatus(serviceProvider.getStatus().toString());
         providerDto.setAllServices(serviceProvider.getAllServices());
-        providerDto.setCategories(serviceProvider.getCategory());
-
+        providerDto.setCategory(serviceProvider.getCategory());
+        providerDto.setYearOfExperience(serviceProvider.getYearOfExperience());
+        providerDto.setMinServicePrice(serviceProvider.getMinServicePrice());
+        providerDto.setMaxServicePrice(serviceProvider.getMaxServicePrice());
+        providerDto.setLocation(serviceProvider.getLocation());
         return providerDto;
     }
 
@@ -251,13 +249,6 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
     public int verifyProvider(String email) {
         return providerRepo.verifyProvider(email);
     }
-
-    @Override
-    public ServiceProvider getRawProviderById(Integer providerId) {
-        return providerRepo.findById(providerId).orElseThrow(() ->
-                new ResourceNotFoundException("Provider", "providerId", providerId));
-    }
-
 
     public List<ServiceProvider> getProvidersByIds(List<Integer> providerIds) {
         return providerRepo.findAllById(providerIds);

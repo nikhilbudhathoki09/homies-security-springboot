@@ -2,6 +2,7 @@ package homiessecurity.controllers;
 
 import homiessecurity.dtos.Providers.ProviderDto;
 import homiessecurity.dtos.Providers.ProviderRegistrationRequestDto;
+import homiessecurity.dtos.Providers.UpdateProviderRequestDto;
 import homiessecurity.dtos.Services.AddServiceDto;
 import homiessecurity.dtos.Services.ServicesDto;
 import homiessecurity.entities.ServiceCategory;
@@ -38,12 +39,6 @@ public class ProviderController {
         return new ResponseEntity<List<ServiceProvider>>(this.providerService.getAllProviders(), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/register" ,consumes = "application/json;charset=UTF-8")
-    public ResponseEntity<ProviderRegistrationRequestDto> registerServiceProvider(@Valid @RequestBody ProviderRegistrationRequestDto register){
-        ProviderRegistrationRequestDto provider = this.providerService.registerServiceProvider(register);
-        return new ResponseEntity<ProviderRegistrationRequestDto>(provider, HttpStatus.CREATED);
-    }
-
     @GetMapping("/verified")
     public ResponseEntity<List<ServiceProvider>> getAllVerifiedProvider(){
         return new ResponseEntity<List<ServiceProvider>>(this.providerService.getAllVerifiedProviders(), HttpStatus.OK);
@@ -54,13 +49,24 @@ public class ProviderController {
         return new ResponseEntity<ProviderDto>(this.providerService.getServiceProviderById(providerId), HttpStatus.OK);
     }
 
+    @PutMapping("/{providerId}")
+    public ResponseEntity<?> updateServiceProvider(@Valid @PathVariable int providerId,
+                                                   @RequestBody UpdateProviderRequestDto updateDto,
+                                                   @RequestParam(value = "providerImage", required = false) MultipartFile providerImage) {
+        if (providerImage != null && !providerImage.isEmpty()) {
+            updateDto.setProviderImage(providerImage);
+        }
+        ProviderDto updatedProviderDto = providerService.updateServiceProvider(providerId, updateDto);
+        return new ResponseEntity<>(updatedProviderDto, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{providerId}")
     public ResponseEntity<String> deleteProviderById(@PathVariable Integer providerId){
         this.providerService.deleteProviderById(providerId);
         return new ResponseEntity<String>("Provider deleted successfully", HttpStatus.OK);
     }
 
-    @PutMapping("/{providerId}/status")
+    @PutMapping("/{providerId}/update-status")
     public ResponseEntity<ServiceProvider> updateProviderStatus(@PathVariable Integer providerId, @RequestParam String status){
         return new ResponseEntity<ServiceProvider>(this.providerService.updateProviderStatus(providerId, status), HttpStatus.OK);
     }

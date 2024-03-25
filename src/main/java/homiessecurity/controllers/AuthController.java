@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Provider;
 
@@ -60,12 +61,31 @@ public class AuthController {
     }
 
     @PostMapping("/providers/register")
-    public ResponseEntity<ProviderDto> registerProvider(@Valid @ModelAttribute ProviderRegistrationRequestDto register,
-                                                        @RequestParam(value = "providerImage", required = false) MultipartFile file){
-        register.setProviderImage(file);
+    public ResponseEntity<ProviderDto> registerProvider(@Valid ProviderRegistrationRequestDto register,
+                                                        @RequestParam(value = "providerImage", required = false) MultipartFile providerImage,
+                                                        @RequestParam(value="registrationDocument") MultipartFile registrationDocument,
+                                                        @RequestParam(value="experienceDocument") MultipartFile experienceDocument) {
+
+        if (registrationDocument.isEmpty()) {
+            throw new CustomCommonException("Registration document must not be empty.");
+        }
+
+        if (experienceDocument.isEmpty()) {
+            throw new CustomCommonException("Registration document must not be empty.");
+        }
+        if (providerImage != null && !providerImage.isEmpty()) {
+            register.setProviderImage(providerImage);
+        } else {
+            register.setProviderImage(null);
+        }
+
+        register.setRegistrationDocument(registrationDocument);
+        register.setExperienceDocument(experienceDocument);
+
         ProviderDto provider = this.authService.registerProvider(register);
-        return new ResponseEntity<ProviderDto>(provider, HttpStatus.CREATED);
+        return new ResponseEntity<>(provider, HttpStatus.CREATED);
     }
+
 
     @GetMapping(value="/providers/verify")
     public ResponseEntity<ApiResponse> verifyProvider(@RequestParam String token){

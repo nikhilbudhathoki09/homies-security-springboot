@@ -4,6 +4,7 @@ package homiessecurity.service;
 
 import homiessecurity.dtos.Providers.ProviderDto;
 import homiessecurity.dtos.Providers.ProviderRegistrationRequestDto;
+import homiessecurity.dtos.Providers.UpdateProviderRequestDto;
 import homiessecurity.entities.ServiceCategory;
 import homiessecurity.entities.ServiceProvider;
 import homiessecurity.entities.Services;
@@ -15,8 +16,6 @@ import java.util.List;
 
 @Service
 public interface ProviderService {
-
-    public ProviderRegistrationRequestDto registerServiceProvider(ProviderRegistrationRequestDto register);
 
     public ProviderDto getServiceProviderById(Integer providerId);
 
@@ -35,9 +34,9 @@ public interface ProviderService {
 
     public ServiceProvider getServiceProviderByEmail(String email);
 
+    public ProviderDto updateServiceProvider(int providerId, UpdateProviderRequestDto updateDto);
 
     List<Services> getAllServicesById(Integer providerId);
-
 
     public void updateService(ServiceProvider provider);
 
@@ -49,17 +48,10 @@ public interface ProviderService {
 
     int verifyProvider(String email);
 
-    public ServiceProvider getRawProviderById(Integer providerId);
-
-
     public List<Integer> getSuggestedProviderIds(Integer providerId);
 
     public List<ServiceProvider> getProvidersByIds(List<Integer> providerIds);
 
     public ServiceProvider saveProvider(ServiceProvider provider);
 
-
-
-
-    
 }

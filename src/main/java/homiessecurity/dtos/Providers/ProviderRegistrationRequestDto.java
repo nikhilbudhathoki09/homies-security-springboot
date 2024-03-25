@@ -3,6 +3,8 @@ package homiessecurity.dtos.Providers;
 
 import homiessecurity.entities.Status;
 import homiessecurity.entities.ServiceCategory;
+import homiessecurity.utils.FileNotEmpty;
+import homiessecurity.utils.IsImage;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -35,7 +37,6 @@ public class ProviderRegistrationRequestDto {
     private String phoneNumber;
 
     @NotBlank(message = "Address cannot be set empty.")
-    @Size(min = 10, max = 100, message = "Address must be 10-100 characters")
     private String address;
 
 
@@ -52,10 +53,8 @@ public class ProviderRegistrationRequestDto {
     @Nullable
     private MultipartFile providerImage;
 
-    @NotBlank(message = "Registration Document cannot be set empty.")
     private MultipartFile registrationDocument;
 
-    @NotBlank(message = "Experience Document cannot be set empty.")
     private MultipartFile experienceDocument;
 
 

@@ -4,10 +4,12 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
+@ToString
 public class UpdateProviderRequestDto {
 
     @Size(min = 3, max = 20, message = "Provider name must be between 3 and 20 characters")
@@ -25,9 +27,12 @@ public class UpdateProviderRequestDto {
     @Nullable
     private MultipartFile providerImage;
 
-    private double yearOfExperience;
-    private double minServicePrice;
-    private double maxServicePrice;
+
+    private Double yearOfExperience;
+    private Double minServicePrice;
+    private Double maxServicePrice;
+    private Integer categoryId;
+    private Integer locationId;
 
 
 }

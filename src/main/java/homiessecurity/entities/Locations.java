@@ -18,4 +18,7 @@ public class Locations {
     private String name;
     private String description;
 
+
+
+
 }

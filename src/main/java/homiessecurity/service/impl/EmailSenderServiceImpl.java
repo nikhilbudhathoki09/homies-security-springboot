@@ -1,5 +1,6 @@
 package homiessecurity.service.impl;
 
+import homiessecurity.entities.Status;
 import homiessecurity.service.EmailSenderService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -100,6 +101,26 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         helper.setText(text, true);
         mailSender.send(message);
     }
+
+    public void sendStatusChangeEmail(String toEmail, String name, Status status, String subject) throws MessagingException {
+        Context context = new Context();
+        context.setVariables(Map.of(
+                "name", name,
+                "status", status.toString().toLowerCase() // Using the status for conditional rendering in the template
+        ));
+        String text = templateEngine.process("statusChangeEmail", context);
+
+        MimeMessage message = getMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setPriority(1);
+        helper.setSubject(subject);
+        helper.setFrom("nikhilbudhathoki0@gmail.com");
+        helper.setTo(toEmail);
+        helper.setText(text, true);
+        mailSender.send(message);
+    }
+
+
 
     private String getUserPasswordResetUrl(String token) {
         return "http://localhost:8000/api/v1/auth/users/reset-password?token=" + token;

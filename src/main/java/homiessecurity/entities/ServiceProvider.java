@@ -73,7 +73,7 @@ public class ServiceProvider implements UserDetails {
     private String subscriptionToken;
 
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Locations location;
 

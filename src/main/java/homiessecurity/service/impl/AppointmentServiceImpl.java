@@ -20,6 +20,7 @@ import java.util.List;
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
     private final ProviderService providerService;
+
     private final UserService userService;
     private final AppointmentRepository appointmentRepository;
     private final ServicesService servicesService;
@@ -55,7 +56,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .provider(provider)
                 .user(user)
                 .service(service)
-                .status(Status.PENDING) // Assuming "PENDING" is a valid status
+                .status(Status.PENDING)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -86,7 +87,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Appointment respondAppointment(Integer appointmentId, String action) {
         Appointment appointment = getAppointmentById(appointmentId);
-        System.out.println(action);
         switch (action) {
             case "ACCEPTED":
                 appointment.setStatus(Status.ACCEPTED);

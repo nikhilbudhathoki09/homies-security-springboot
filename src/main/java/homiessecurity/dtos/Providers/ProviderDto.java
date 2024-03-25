@@ -1,5 +1,6 @@
 package homiessecurity.dtos.Providers;
 
+import homiessecurity.entities.Locations;
 import homiessecurity.entities.ServiceCategory;
 import homiessecurity.entities.Services;
 import homiessecurity.entities.Status;
@@ -8,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.xml.stream.Location;
 import java.util.List;
 
 @Data
@@ -25,6 +27,11 @@ public class ProviderDto {
     private String status;
 
     private List<Services> allServices;
-    private ServiceCategory categories;
+    private ServiceCategory category;
+    private double yearOfExperience;
+    private double minServicePrice;
+    private double maxServicePrice;
+    private Locations location;
+
 
 }

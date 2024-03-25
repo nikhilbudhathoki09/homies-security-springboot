@@ -136,6 +136,7 @@ public class AuthenticationService {
 
 
     public ProviderDto registerProvider(ProviderRegistrationRequestDto register) {
+        String providerImageUrl = null;
         if(providerRepo.existsByEmail(register.getEmail())) {
             throw new ResourceAlreadyExistsException("Email already exists. Try a new one");
         }
@@ -145,7 +146,10 @@ public class AuthenticationService {
         }
 
         // Uploading files to Cloudinary and getting the URLs
-        String providerImageUrl = cloudinary.uploadImage(register.getProviderImage(), "ProviderImages");
+
+        if (register.getProviderImage() != null && !register.getProviderImage().isEmpty()) {
+            providerImageUrl = cloudinary.uploadImage(register.getProviderImage(), "ProviderImages");
+        }
         String registrationDocumentUrl = cloudinary.uploadImage(register.getRegistrationDocument(), "ProviderDocs");
         String experienceDocumentUrl = cloudinary.uploadImage(register.getExperienceDocument(), "ProviderDocs");
 

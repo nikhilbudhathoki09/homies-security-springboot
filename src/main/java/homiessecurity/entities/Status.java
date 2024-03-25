@@ -5,7 +5,7 @@ public enum Status {
     APPROVED,
     REJECTED,
     SUSPENDED,
+    //this one is for the appointments
     CANCELLED,
     ACCEPTED,
-
 }
