@@ -131,6 +131,11 @@ public class UserServiceImpl implements UserService, UserDetailsService{
                 new ResourceNotFoundException("User", "userId", userId));
     }
 
+    @Override
+    public User saveUser(User user) {
+        return this.userRepo.save(user);
+    }
+
 
     public UserDto updateUser(UserDto userDto) {
         User user = this.userRepo.findByEmail(userDto.getEmail()).orElseThrow(() ->

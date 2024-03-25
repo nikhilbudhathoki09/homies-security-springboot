@@ -22,6 +22,8 @@ public interface ProviderService {
 
     public ServiceProvider getProviderById(Integer providerId);
 
+    public ServiceProvider getProviderByEmail(String email);
+
 
     public List<ServiceProvider> getAllProviders();
 
@@ -49,11 +51,14 @@ public interface ProviderService {
 
     public ServiceProvider getRawProviderById(Integer providerId);
 
-    public String getCategoryNameById(Integer providerId);
 
     public List<Integer> getSuggestedProviderIds(Integer providerId);
 
     public List<ServiceProvider> getProvidersByIds(List<Integer> providerIds);
+
+    public ServiceProvider saveProvider(ServiceProvider provider);
+
+
 
 
     

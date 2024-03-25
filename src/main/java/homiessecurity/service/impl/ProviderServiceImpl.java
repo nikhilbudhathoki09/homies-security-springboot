@@ -3,6 +3,7 @@ package homiessecurity.service.impl;
 
 import homiessecurity.dtos.Providers.ProviderDto;
 import homiessecurity.dtos.Providers.ProviderRegistrationRequestDto;
+import homiessecurity.dtos.Providers.UpdateProviderRequestDto;
 import homiessecurity.entities.*;
 import homiessecurity.exceptions.CustomCommonException;
 import homiessecurity.exceptions.ResourceAlreadyExistsException;
@@ -28,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
@@ -101,6 +103,42 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
         
     }
 
+    public ProviderDto updateServiceProvider(int providerId, UpdateProviderRequestDto updateDto) {
+        ServiceProvider provider = getProviderById(providerId);
+
+        // Update the fields
+        if (updateDto.getProviderName() != null) {
+            provider.setProviderName(updateDto.getProviderName());
+        }
+        if (updateDto.getDescription() != null) {
+            provider.setDescription(updateDto.getDescription());
+        }
+        if (updateDto.getPhoneNumber() != null) {
+            provider.setPhoneNumber(updateDto.getPhoneNumber());
+        }
+        if (updateDto.getAddress() != null) {
+            provider.setAddress(updateDto.getAddress());
+        }
+        if (updateDto.getYearOfExperience() > 0) {
+            provider.setYearOfExperience(updateDto.getYearOfExperience());
+        }
+        if (updateDto.getMinServicePrice() >= 0) { // Assuming 0 is a valid price, adjust as necessary
+            provider.setMinServicePrice(updateDto.getMinServicePrice());
+        }
+        if (updateDto.getMaxServicePrice() >= 0) { // Assuming 0 is a valid price, adjust as necessary
+            provider.setMaxServicePrice(updateDto.getMaxServicePrice());
+        }
+
+
+        provider.setUpdatedAt(LocalDateTime.now()); // Update the 'updatedAt' field to the current time
+
+        ServiceProvider updatedProvider = providerRepo.save(provider);
+
+        // Convert the updated provider entity to a DTO to return. Assuming you have a modelMapper or similar mapping utility.
+        return modelMapper.map(updatedProvider, ProviderDto.class);
+    }
+
+
     @Override
     public ProviderDto getServiceProviderById(Integer providerId) {
         ServiceProvider provider = this.providerRepo.findById(providerId).orElseThrow(()-> new ResourceNotFoundException(
@@ -115,6 +153,12 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
                 "Provider", "ProviderId", providerId));
 
         return provider;
+    }
+
+    @Override
+    public ServiceProvider getProviderByEmail(String email) {
+        return this.providerRepo.findByEmail(email).orElseThrow(()->
+                new ResourceNotFoundException("Provider", "email", email));
     }
 
 
@@ -151,17 +195,11 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
     }
 
 
-
-
-
-
     @Override
     public List<Services> getAllServicesById(Integer providerId) {
         ServiceProvider provider = getProviderById(providerId);
         return provider.getAllServices();
     }
-
-
 
     @Override
     public void updateService(ServiceProvider provider) {
@@ -182,7 +220,6 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
         this.providerRepo.delete(provider);
         return new ApiResponse("Provider deleted successfully", true);
     }
-
 
     public static ServiceProvider mapToServiceProvider(ProviderRegistrationRequestDto requestDto) {
         ServiceProvider serviceProvider = new ServiceProvider();
@@ -221,36 +258,40 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
                 new ResourceNotFoundException("Provider", "providerId", providerId));
     }
 
-    @Override
-    public String getCategoryNameById(Integer providerId) {
-        ServiceProvider provider = getProviderById(providerId);
-        ServiceCategory category = provider.getCategory();
-        return category != null ? category.getTitle().toLowerCase() : null;
-    }
 
     public List<ServiceProvider> getProvidersByIds(List<Integer> providerIds) {
-        // Use your repository to fetch provider objects by IDs
         return providerRepo.findAllById(providerIds);
     }
 
+    @Override
+    public ServiceProvider saveProvider(ServiceProvider provider) {
+        return providerRepo.save(provider);
+    }
 
+    @Override
     public List<Integer> getSuggestedProviderIds(Integer providerId) {
         String flaskServiceUrl = "http://127.0.0.1:5000/suggest-providers";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>("{\"providerId\":" + providerId + "}", headers);
 
-        // Adjusted to expect a response as a Map
-        ResponseEntity<Map<String, List<Integer>>> response = restTemplate.exchange(
-                flaskServiceUrl,
-                HttpMethod.POST,
-                entity,
-                new ParameterizedTypeReference<Map<String, List<Integer>>>() {}
-        );
+        try {
+            // Adjusted to expect a response as a Map
+            ResponseEntity<Map<String, List<Integer>>> response = restTemplate.exchange(
+                    flaskServiceUrl,
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<Map<String, List<Integer>>>() {
+                    }
+            );
 
-        // Extract the list of suggested provider IDs from the response map
-        List<Integer> suggestedProviderIds = response.getBody().get("suggested_provider_ids");
-        return suggestedProviderIds;
+            // Extract the list of suggested provider IDs from the response map
+            List<Integer> suggestedProviderIds = response.getBody().get("suggested_provider_ids");
+            return suggestedProviderIds;
+        } catch (HttpClientErrorException.NotFound e) {
+            System.out.println("Provider not found: " + e.getMessage());
+            throw new ResourceNotFoundException("Provider", "providerId", providerId);
+        }
     }
 
 

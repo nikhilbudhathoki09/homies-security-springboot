@@ -52,28 +52,12 @@ public class ProviderRegistrationRequestDto {
     @Nullable
     private MultipartFile providerImage;
 
+    @NotBlank(message = "Registration Document cannot be set empty.")
+    private MultipartFile registrationDocument;
 
+    @NotBlank(message = "Experience Document cannot be set empty.")
+    private MultipartFile experienceDocument;
 
-
-
-//    private Status status;
-//
-//    private LocalDateTime createdAt;
-//
-//    private LocalDateTime updatedAt;
-//
-//    private List<ServiceCategory> categories;
-
-
-
-//    @NotBlank(message = "Registration Document cannot be set empty.")
-//    private MultipartFile registrationDocument;
-//
-//    @NotBlank(message = "Experience Document cannot be set empty.")
-//    private MultipartFile experienceDocument;
-//
-//    @NotBlank(message = "Provider Image cannot be set empty.")
-//    private MultipartFile providerImage;
 
 
     

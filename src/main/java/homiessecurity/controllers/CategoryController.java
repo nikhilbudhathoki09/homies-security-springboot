@@ -65,8 +65,8 @@ public class CategoryController {
         return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/title/{title}")
-    public ResponseEntity<ServiceCategory> getCategoryByTitle(@PathVariable String title){
+    @GetMapping("/title")
+    public ResponseEntity<ServiceCategory> getCategoryByTitle(@RequestParam String title){
         ServiceCategory category = this.categoryService.getCategoryByTitle(title);
         return new ResponseEntity<ServiceCategory>(category, HttpStatus.OK);
     }

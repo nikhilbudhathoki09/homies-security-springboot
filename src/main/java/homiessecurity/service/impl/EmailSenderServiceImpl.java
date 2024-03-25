@@ -20,21 +20,6 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-
-    @Override
-    public void sendEmail(String toEmail, String body, String subject) throws MessagingException {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("nikhilbudhathoki0@gmail.com");
-        message.setTo(toEmail);
-        message.setText(body);
-        message.setSubject(subject);
-
-        mailSender.send(message);
-
-        System.out.println("Mail sent sucessfully");
-
-    }
-
     @Override
     public void sendHtmlEmail(String toEmail, String name, String subject) throws MessagingException {
 
@@ -84,20 +69,55 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         helper.setTo(toEmail);
         helper.setText(text, true);
         mailSender.send(message);
-        System.out.println("Mail sent sucessfully");
+    }
+
+    public void sendUserPasswordResetEmail(String toEmail, String name, String subject, String token) throws MessagingException {
+        String resetUrl = getUserPasswordResetUrl(token);
+        Context context = new Context();
+        context.setVariables(Map.of("name", name, "resetUrl", resetUrl));
+        String text = templateEngine.process("passwordResetMail", context); // Assume you have a template named passwordResetEmailUser.html
+        MimeMessage message = getMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setPriority(1);
+        helper.setSubject(subject);
+        helper.setFrom("nikhilbudhathoki0@gmail.com");
+        helper.setTo(toEmail);
+        helper.setText(text, true);
+        mailSender.send(message);
+    }
+
+    public void sendProviderPasswordResetEmail(String toEmail, String name, String subject, String token) throws MessagingException {
+        String resetUrl = getProviderPasswordResetUrl(token);
+        Context context = new Context();
+        context.setVariables(Map.of("name", name, "resetUrl", resetUrl));
+        String text = templateEngine.process("passwordResetMail", context); // Assume you have a template named passwordResetEmailUser.html
+        MimeMessage message = getMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setPriority(1);
+        helper.setSubject(subject);
+        helper.setFrom("nikhilbudhathoki0@gmail.com");
+        helper.setTo(toEmail);
+        helper.setText(text, true);
+        mailSender.send(message);
+    }
+
+    private String getUserPasswordResetUrl(String token) {
+        return "http://localhost:8000/api/v1/auth/users/reset-password?token=" + token;
+    }
+
+    private String getProviderPasswordResetUrl(String token) {
+        return "http://localhost:8000/api/v1/auth/providers/reset-password?token=" + token;
     }
 
 
 
     public String getVerificationUrl(String token){
         String url = "http://localhost:8000/api/v1/auth/verify?token=" + token;
-        System.out.println(url);
         return url;
     }
 
     public String getProviderVerificationUrl(String token){
         String url = "http://localhost:8000/api/v1/auth/providers/verify?token=" + token;
-        System.out.println(url);
         return url;
     }
 

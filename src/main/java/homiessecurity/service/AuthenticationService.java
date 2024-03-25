@@ -96,7 +96,6 @@ public class AuthenticationService {
                     "Verify your email",
                     emailResponse.getVerificationToken());
 
-            System.out.println("username : " + savedUser.getName());
         }catch (MessagingException e){
             System.out.println("Error sending email");
             throw new RuntimeException(e);
@@ -137,15 +136,18 @@ public class AuthenticationService {
 
 
     public ProviderDto registerProvider(ProviderRegistrationRequestDto register) {
-        if(providerRepo.existsByEmail(register.getEmail())){
+        if(providerRepo.existsByEmail(register.getEmail())) {
             throw new ResourceAlreadyExistsException("Email already exists. Try a new one");
         }
 
-        if(providerRepo.existsByPhoneNumber(register.getPhoneNumber())){
-            throw new ResourceAlreadyExistsException("PhoneNumber is already  in use. Try a new one ");
+        if(providerRepo.existsByPhoneNumber(register.getPhoneNumber())) {
+            throw new ResourceAlreadyExistsException("PhoneNumber is already in use. Try a new one ");
         }
 
-//        Locations location = locationService.getLocationById(register.getLocation());
+        // Uploading files to Cloudinary and getting the URLs
+        String providerImageUrl = cloudinary.uploadImage(register.getProviderImage(), "ProviderImages");
+        String registrationDocumentUrl = cloudinary.uploadImage(register.getRegistrationDocument(), "ProviderDocs");
+        String experienceDocumentUrl = cloudinary.uploadImage(register.getExperienceDocument(), "ProviderDocs");
 
         ServiceProvider provider = ServiceProvider.builder()
                 .providerName(register.getProviderName())
@@ -157,24 +159,31 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(register.getPassword()))
                 .address(register.getAddress())
                 .description(register.getDescription())
+                .providerImage(providerImageUrl)
+                .registrationDocument(registrationDocumentUrl)
+                .experienceDocument(experienceDocumentUrl)
                 .build();
 
         ServiceProvider requestedProvider = providerRepo.save(provider);
+
         var jwtToken = jwtService.generateToken(requestedProvider);
         EmailVerificationResponse emailResponse = emailVerificationService.getEmailVerification(requestedProvider);
-        try {
-                emailSenderService.sendProviderVerificationEmail(requestedProvider.getEmail(),
-                        requestedProvider.getProviderName(),
-                        "Verify your email"
-                        , emailResponse.getVerificationToken());
-            } catch (MessagingException e) {
-                System.out.println("Error sending email");
-                throw new RuntimeException(e);
-            }
+
+//        try {
+//            emailSenderService.sendProviderVerificationEmail(
+//                    requestedProvider.getEmail(),
+//                    requestedProvider.getProviderName(),
+//                    "Verify your email",
+//                    emailResponse.getVerificationToken()
+//            );
+//        } catch (MessagingException e) {
+//            System.out.println("Error sending email");
+//            throw new RuntimeException(e);
+//        }
 
         return providerService.mapToProviderDto(requestedProvider);
-
     }
+
 
 
     public AuthenticationResponse authenticateProvider(LoginRequest request) {

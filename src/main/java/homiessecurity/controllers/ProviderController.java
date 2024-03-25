@@ -9,6 +9,7 @@ import homiessecurity.entities.ServiceProvider;
 import homiessecurity.entities.Services;
 import homiessecurity.service.ProviderService;
 import homiessecurity.service.ServicesService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class ProviderController {
     }
 
     @PostMapping(path = "/register" ,consumes = "application/json;charset=UTF-8")
-    public ResponseEntity<ProviderRegistrationRequestDto> registerServiceProvider(@RequestBody ProviderRegistrationRequestDto register){
+    public ResponseEntity<ProviderRegistrationRequestDto> registerServiceProvider(@Valid @RequestBody ProviderRegistrationRequestDto register){
         ProviderRegistrationRequestDto provider = this.providerService.registerServiceProvider(register);
         return new ResponseEntity<ProviderRegistrationRequestDto>(provider, HttpStatus.CREATED);
     }
@@ -127,20 +128,9 @@ public class ProviderController {
         return new ResponseEntity<>("Service deleted successfully", HttpStatus.OK);
     }
 
-//    @GetMapping("/{providerId}/suggestions")
-//    public ResponseEntity<List<ServiceProvider>> getSuggestedProviders(@PathVariable Integer providerId) {
-//        ServiceProvider provider = providerService.getRawProviderById(providerId);
-//        List<ServiceProvider> suggestedProviders = providerService.getSuggestedProviders(provider);
-//        return new ResponseEntity<>(suggestedProviders, HttpStatus.OK);
-//    }
-
-    @GetMapping("/{providerId}/suggestions")
-    public ResponseEntity<List<ServiceProvider>> getSuggestedProviders(@PathVariable Integer providerId) {
+    @GetMapping("/suggested-providers")
+    public ResponseEntity<List<ServiceProvider>> getSuggestedProviders(@RequestParam Integer providerId) {
         List<Integer> suggestedProviderIds = providerService.getSuggestedProviderIds(providerId);
-        System.out.println("Suggested Provider IDs:");
-        for (Integer id : suggestedProviderIds) {
-            System.out.println(id);
-        }
         List<ServiceProvider> suggestedProviders = providerService.getProvidersByIds(suggestedProviderIds);
         return new ResponseEntity<>(suggestedProviders, HttpStatus.OK);
     }

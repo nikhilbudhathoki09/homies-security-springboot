@@ -2,12 +2,15 @@ package homiessecurity.controllers;
 
 import homiessecurity.dtos.Auth.AuthenticationResponse;
 import homiessecurity.dtos.Auth.LoginRequest;
+import homiessecurity.dtos.Auth.PasswordResetRequest;
 import homiessecurity.dtos.Providers.ProviderDto;
 import homiessecurity.dtos.Providers.ProviderRegistrationRequestDto;
 import homiessecurity.dtos.Users.UserRegisterDto;
+import homiessecurity.exceptions.CustomCommonException;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.service.AuthenticationService;
 import homiessecurity.service.EmailVerificationService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,6 +70,34 @@ public class AuthController {
     @GetMapping(value="/providers/verify")
     public ResponseEntity<ApiResponse> verifyProvider(@RequestParam String token){
         return new ResponseEntity<ApiResponse>(emailService.confirmProviderToken(token), HttpStatus.OK);
+    }
+
+// Endpoint to initiate a password reset request for a User
+    @PostMapping("/user/reset-password-request")
+    public ResponseEntity<?> requestUserPasswordReset(@RequestBody PasswordResetRequest passwordResetRequest) throws MessagingException {
+        emailService.initiatePasswordResetForUser(passwordResetRequest.getEmail());
+        return ResponseEntity.ok("Password reset link has been sent to your email.");
+    }
+
+    // Endpoint to reset a User's password
+    @PostMapping("/user/reset-password")
+    public ResponseEntity<?> resetUserPassword(@RequestParam String token, @RequestBody PasswordResetRequest passwordResetRequest) {
+        emailService.resetUserPassword(token, passwordResetRequest.getNewPassword());
+        return ResponseEntity.ok("Your password has been successfully reset.");
+    }
+
+    // Endpoint to initiate a password reset request for a ServiceProvider
+    @PostMapping("/provider/reset-password-request")
+    public ResponseEntity<?> requestProviderPasswordReset(@RequestBody PasswordResetRequest passwordResetRequest)throws MessagingException {
+        emailService.initiatePasswordResetForProvider(passwordResetRequest.getEmail());
+        return ResponseEntity.ok("Password reset link has been sent to your email.");
+    }
+
+
+    @PostMapping("/provider/reset-password")
+    public ResponseEntity<?> resetProviderPassword(@RequestParam String token, @RequestBody PasswordResetRequest passwordResetRequest) {
+        emailService.resetProviderPassword(token, passwordResetRequest.getNewPassword());
+        return ResponseEntity.ok("Your password has been successfully reset.");
     }
 
 }

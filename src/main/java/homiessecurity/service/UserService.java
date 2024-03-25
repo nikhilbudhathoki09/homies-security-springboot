@@ -26,5 +26,7 @@ public interface UserService {
 
     User getRawUserById(Integer userId);
 
+    User saveUser(User user);
+
 
 }
