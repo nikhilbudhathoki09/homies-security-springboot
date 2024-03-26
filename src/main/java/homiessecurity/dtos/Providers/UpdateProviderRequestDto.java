@@ -15,7 +15,6 @@ public class UpdateProviderRequestDto {
     @Size(min = 3, max = 20, message = "Provider name must be between 3 and 20 characters")
     private String providerName;
 
-    @Size(min = 10, max = 100, message = "Description must be between 10 and 100 characters")
     private String description;
 
     @Size(min = 10, max = 10, message = "Phone Number must be 10 characters")
@@ -24,10 +23,10 @@ public class UpdateProviderRequestDto {
     @Size(min = 10, max = 100, message = "Address must be between 10 and 100 characters")
     private String address;
 
-    @Nullable
-    private MultipartFile providerImage;
+//    @Nullable
+//    private MultipartFile providerImage;
 
-
+    private String providerImageUrl;
     private Double yearOfExperience;
     private Double minServicePrice;
     private Double maxServicePrice;

@@ -41,12 +41,8 @@ public interface ServicesService {
 
     List<ServicesDto> getServicesByProviderName(String name);
 
+    public List<ServicesDto> getServicesByCategoryIdAndLocationId(Integer categoryId, Integer locationId);
 
+    public List<ServicesDto> getServicesByLocationId(Integer locationId);
 
-
-
-
-
-    
-   
 }

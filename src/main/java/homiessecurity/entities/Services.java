@@ -31,16 +31,16 @@ public class Services {
     
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
-    @JsonBackReference
+    @JsonBackReference(value = "category_services")
     private ServiceCategory category;
 
     @ManyToOne
     @JoinColumn(name = "provider_id", referencedColumnName = "id")
-    @JsonBackReference
+    @JsonBackReference(value = "provider-service")
     private ServiceProvider provider;
 
-    @OneToMany(mappedBy = "service")
-    @JsonBackReference
+    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
+    @JsonBackReference(value = "service-appointment")
     private List<Appointment> appointments;
 
 

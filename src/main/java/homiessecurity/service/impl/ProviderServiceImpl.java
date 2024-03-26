@@ -66,7 +66,7 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
 
 
     public ProviderDto updateServiceProvider(int providerId, UpdateProviderRequestDto updateDto) {
-        String imageUrl = null;
+
         ServiceProvider provider = getProviderById(providerId);
 
         // Update the fields
@@ -77,7 +77,12 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
             provider.setDescription(updateDto.getDescription());
         }
         if (updateDto.getPhoneNumber() != null) {
-            provider.setPhoneNumber(updateDto.getPhoneNumber());
+            if(providerRepo.existsByPhoneNumber(updateDto.getPhoneNumber())) {
+                throw new ResourceAlreadyExistsException("PhoneNumber is already in use. Try a new one ");
+            }else{
+                provider.setPhoneNumber(updateDto.getPhoneNumber());
+            }
+
         }
         if (updateDto.getAddress() != null) {
             provider.setAddress(updateDto.getAddress());
@@ -100,9 +105,8 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
             provider.setLocation(locationService.getLocationById(updateDto.getLocationId()));
         }
 
-        if(updateDto.getProviderImage() != null){
-            imageUrl = cloudinaryService.uploadImage(updateDto.getProviderImage(), "ProviderImages");
-            provider.setProviderImage(imageUrl);
+        if (updateDto.getProviderImageUrl() != null) {
+            provider.setProviderImage(updateDto.getProviderImageUrl());
         }
 
 
@@ -258,6 +262,13 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
     public ServiceProvider saveProvider(ServiceProvider provider) {
         return providerRepo.save(provider);
     }
+
+    @Override
+    public List<ProviderDto> getProvidersByLocationId(Integer locationId) {
+        return null;
+    }
+
+
 
     @Override
     public List<Integer> getSuggestedProviderIds(Integer providerId) {

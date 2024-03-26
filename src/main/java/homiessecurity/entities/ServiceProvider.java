@@ -73,10 +73,10 @@ public class ServiceProvider implements UserDetails {
     private String subscriptionToken;
 
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id", referencedColumnName = "id")
+    @JsonBackReference(value = "location_providers")
     private Locations location;
-
 
     private double yearOfExperience;
 
@@ -90,26 +90,21 @@ public class ServiceProvider implements UserDetails {
     private Double averageRating;
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value = "provider-service")
     private List<Services> allServices = new ArrayList<>();
 
 
-//    @ManyToMany
-//    @JoinTable(name = "provider_categories", joinColumns = @JoinColumn(name= "provider_id"),
-//               inverseJoinColumns = @JoinColumn(name = "category_id"))
-//    private List<ServiceCategory> categories = new ArrayList<>(1);  //making the size of the category to 3 so the provider can only choose 3 categories
-
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
-    @JsonBackReference
+    @JsonBackReference(value = "category_providers")
     private ServiceCategory category;
 
     @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value = "provider-appointment")
     private List<Appointment> appointments = new ArrayList<>();
 
     @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value = "provider-rating")
     private List<Rating> ratings = new ArrayList<>();
 
 

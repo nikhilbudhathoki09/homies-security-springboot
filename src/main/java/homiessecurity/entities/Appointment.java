@@ -40,27 +40,22 @@ public class Appointment {
 
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provider_id")
-    @JsonBackReference
+    @JsonBackReference(value = "provider-appointment")
     private ServiceProvider provider;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonBackReference(value = "user-appointment")
     private User user;
 
-//    @ManyToMany(targetEntity = Services.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinTable(name = "appointment_services", joinColumns = @JoinColumn(name = "appointment_id"), inverseJoinColumns = @JoinColumn(name = "service_id"))
-//    @JsonManagedReference
-//    private List<Services> allServices;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_id")
-    @JsonBackReference
+    @JsonBackReference(value = "service-appointment")
     private Services service;
 
 
-//    private String additionalImage;
 
 }

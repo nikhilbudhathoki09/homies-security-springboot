@@ -54,4 +54,6 @@ public interface ProviderService {
 
     public ServiceProvider saveProvider(ServiceProvider provider);
 
+    public List<ProviderDto> getProvidersByLocationId(Integer locationId);
+
 }

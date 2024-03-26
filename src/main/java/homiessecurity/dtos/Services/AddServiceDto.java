@@ -1,6 +1,7 @@
 package homiessecurity.dtos.Services;
 
 
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +18,11 @@ public class AddServiceDto {
 
     private String description;
 
-    private double perHourRate;
+    private Double perHourRate;
 
     private String  categoryName;
 
-//    private Integer providerId;
+    @Nullable
     private MultipartFile serviceImage;
 
 

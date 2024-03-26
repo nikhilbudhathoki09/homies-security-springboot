@@ -12,6 +12,7 @@ import homiessecurity.service.CategoryService;
 import homiessecurity.service.CloudinaryService;
 import homiessecurity.service.ProviderService;
 import homiessecurity.service.ServicesService;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,7 +89,7 @@ public class ServicesServiceImpl implements ServicesService {
         if(service.getDescription() != null){
             services.setDescription(service.getDescription());
         }
-        if(Double.isNaN(service.getPerHourRate())){
+        if(service.getPerHourRate() != null){
             services.setPerHourRate(service.getPerHourRate());
         }
         if(service.getServiceImage() != null){
@@ -145,15 +146,48 @@ public class ServicesServiceImpl implements ServicesService {
         return allServicesDto;
     }
 
+
     @Override
     public List<ServicesDto> getSearchedServices(String search) {
-        List<Services> searchedServices =  servicesRepo.findByServiceNameContainingIgnoreCase(search).orElseThrow(() ->
-                new ResourceNotFoundException("Service", "search", search));
+        List<Services> searchedServices = servicesRepo.findSearchedServices(search);
 
-        List<ServicesDto> searchedServicesDto = searchedServices.stream().map(service ->
-                modelMapper.map(service, ServicesDto.class)).toList();
+        System.out.println(searchedServices.size() + "size of searched services");
+
+        if (searchedServices.isEmpty()) {
+            throw new ResourceNotFoundException("Service", "search", search);
+        }
+
+        List<ServicesDto> searchedServicesDto = searchedServices.stream()
+                .map(service -> modelMapper.map(service, ServicesDto.class))
+                .toList();
         return searchedServicesDto;
     }
+
+    @Override
+    public List<ServicesDto> getServicesByCategoryIdAndLocationId(Integer categoryId, Integer locationId) {
+        List<Services> services = servicesRepo.findByCategoryIdAndLocationId(categoryId, locationId);
+        return services.stream()
+                .map(service -> modelMapper.map(service, ServicesDto.class))
+                .toList();
+    }
+
+    public List<ServicesDto> getServicesByLocation(String location) {
+        List<Services> services = servicesRepo.findServicesByProviderLocation(location);
+        return services.stream()
+                .map(service -> modelMapper.map(service, ServicesDto.class))
+                .toList();
+    }
+
+    @Override
+    public List<ServicesDto> getServicesByLocationId(Integer locationId) {
+        List<Services> services = servicesRepo.findServicesByProviderLocationId(locationId);
+        return services.stream()
+                .map(service -> modelMapper.map(service, ServicesDto.class))
+                .toList();
+    }
+
+
+
 
     @Override
     public List<ServicesDto> filterServicesByCategory(String category) {

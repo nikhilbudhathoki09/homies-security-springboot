@@ -23,8 +23,4 @@ public class ServicesDto {
 
     private ServiceProvider provider;
 
-
-
-
-
 }

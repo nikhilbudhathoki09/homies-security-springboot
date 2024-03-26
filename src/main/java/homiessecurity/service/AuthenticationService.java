@@ -89,17 +89,17 @@ public class AuthenticationService {
         //verifying the user email which returns(otp and verification token)
         EmailVerificationResponse emailResponse = emailVerificationService.getEmailVerification(savedUser);
 
-        try {
-            //sending the email to the user with verification link to get verified
-            emailSenderService.sendVerificationEmail(savedUser.getEmail(),
-                    savedUser.getName(),
-                    "Verify your email",
-                    emailResponse.getVerificationToken());
-
-        }catch (MessagingException e){
-            System.out.println("Error sending email");
-            throw new RuntimeException(e);
-        }
+//        try {
+//            //sending the email to the user with verification link to get verified
+//            emailSenderService.sendVerificationEmail(savedUser.getEmail(),
+//                    savedUser.getName(),
+//                    "Verify your email",
+//                    emailResponse.getVerificationToken());
+//
+//        }catch (MessagingException e){
+//            System.out.println("Error sending email");
+//            throw new RuntimeException(e);
+//        }
 
         return new ApiResponse("User Registered. Please verify your email to proceed.", true);
     }

@@ -8,6 +8,7 @@ import homiessecurity.dtos.Services.ServicesDto;
 import homiessecurity.entities.ServiceCategory;
 import homiessecurity.entities.ServiceProvider;
 import homiessecurity.entities.Services;
+import homiessecurity.service.CloudinaryService;
 import homiessecurity.service.ProviderService;
 import homiessecurity.service.ServicesService;
 import jakarta.validation.Valid;
@@ -28,9 +29,13 @@ public class ProviderController {
     private final ProviderService providerService;
     private final ServicesService servicesService;
 
-    public ProviderController(ProviderService providerService, ServicesService servicesService){
+    private final CloudinaryService cloudinaryService;
+
+    public ProviderController(ProviderService providerService,CloudinaryService cloudinaryService,
+                              ServicesService servicesService){
         this.providerService = providerService;
         this.servicesService = servicesService;
+        this.cloudinaryService = cloudinaryService;
     }
 
 
@@ -49,16 +54,30 @@ public class ProviderController {
         return new ResponseEntity<ProviderDto>(this.providerService.getServiceProviderById(providerId), HttpStatus.OK);
     }
 
+//    @PutMapping("/{providerId}")
+//    public ResponseEntity<?> updateServiceProvider(@Valid @PathVariable int providerId,
+//                                                   UpdateProviderRequestDto updateDto,
+//                                                   @RequestParam(value = "providerImage", required = false) MultipartFile providerImage) {
+//        if (providerImage != null ) {
+//            updateDto.setProviderImage(providerImage);
+//        }
+//        ProviderDto updatedProviderDto = providerService.updateServiceProvider(providerId, updateDto);
+//        return new ResponseEntity<>(updatedProviderDto, HttpStatus.OK);
+//    }
+
     @PutMapping("/{providerId}")
-    public ResponseEntity<?> updateServiceProvider(@Valid @PathVariable int providerId,
-                                                   @RequestBody UpdateProviderRequestDto updateDto,
+    public ResponseEntity<?> updateServiceProvider(@PathVariable int providerId,
+                                                   @ModelAttribute UpdateProviderRequestDto updateDto,
                                                    @RequestParam(value = "providerImage", required = false) MultipartFile providerImage) {
-        if (providerImage != null && !providerImage.isEmpty()) {
-            updateDto.setProviderImage(providerImage);
+        if (providerImage != null) {
+            String imageUrl = cloudinaryService.uploadImage(providerImage, "ProviderImages");
+            updateDto.setProviderImageUrl(imageUrl); // Set the image URL in the DTO
         }
+
         ProviderDto updatedProviderDto = providerService.updateServiceProvider(providerId, updateDto);
-        return new ResponseEntity<>(updatedProviderDto, HttpStatus.OK);
+        return ResponseEntity.ok(updatedProviderDto);
     }
+
 
     @DeleteMapping("/{providerId}")
     public ResponseEntity<String> deleteProviderById(@PathVariable Integer providerId){
@@ -119,7 +138,7 @@ public class ProviderController {
     }
 
     @PutMapping("/services/{serviceId}")
-    public ResponseEntity<Services> updateService(@PathVariable Integer serviceId, @RequestBody AddServiceDto services,
+    public ResponseEntity<Services> updateService(@Valid @PathVariable Integer serviceId, AddServiceDto services,
                                                   @RequestParam(value = "serviceImage", required = false) MultipartFile file) {
         if(file != null){
             services.setServiceImage(file);
