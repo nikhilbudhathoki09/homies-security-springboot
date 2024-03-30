@@ -1,6 +1,8 @@
 package homiessecurity.service.impl;
 
+import homiessecurity.entities.Appointment;
 import homiessecurity.entities.Status;
+import homiessecurity.exceptions.CustomCommonException;
 import homiessecurity.service.EmailSenderService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -141,6 +145,60 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         String url = "http://localhost:8000/api/v1/auth/providers/verify?token=" + token;
         return url;
     }
+
+    public void sendAppointmentStatusEmail(String toEmail, String userName, String providerName, Status status, LocalDate appointmentDate, String appointmentTime) {
+        try{
+            Context context = new Context();
+            context.setVariable("name", userName);
+            context.setVariable("providerName", providerName);
+            context.setVariable("status", status.toString().toLowerCase()); // "accepted" or "rejected"
+            if (status == Status.ACCEPTED) {
+                context.setVariable("appointmentDate", appointmentDate.toString());
+                context.setVariable("appointmentTime", appointmentTime); // Include appointment time
+            }
+            String text = templateEngine.process("appointmentStatusEmail", context); // Use your email template name here
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setSubject("Appointment Status Update");
+            helper.setFrom("nikhilbudhathoki0@gmail.com"); // Specify your email sender
+            helper.setTo(toEmail);
+            helper.setText(text, true);
+            mailSender.send(message);
+        }catch(MessagingException e){
+            throw new CustomCommonException(e.getMessage());
+        }
+    }
+
+    public void sendReminderEmail(Appointment appointment) {
+        try {
+            Context context = new Context();
+            context.setVariable("providerName", appointment.getProvider().getProviderName());
+            context.setVariable("clientName", appointment.getUser().getName());
+            context.setVariable("appointmentTime", appointment.getArrivalTime());
+            context.setVariable("serviceName", appointment.getService().getServiceName());
+            context.setVariable("detailedLocation", appointment.getDetailedLocation());
+            context.setVariable("arrivalTime", appointment.getArrivalTime());
+
+            String text = templateEngine.process("ReminderEmail", context);
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setSubject("🗓️ Appointment Reminder 🗓️");
+            String fromEmail = "nikhilbudhathoki0@gmail.com";
+            fromEmail = fromEmail.trim(); // Ensure there's no leading or trailing whitespace
+            helper.setFrom(fromEmail);
+            helper.setTo(appointment.getProvider().getEmail());
+            helper.setText(text, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new CustomCommonException(e.getMessage());
+        }
+    }
+
+
+
+
 
 
 }

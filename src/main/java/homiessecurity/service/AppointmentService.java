@@ -3,8 +3,10 @@ package homiessecurity.service;
 import homiessecurity.dtos.Appointments.AppointmentDto;
 import homiessecurity.dtos.Appointments.AppointmentRequestDto;
 import homiessecurity.entities.Appointment;
+import homiessecurity.entities.Status;
 import homiessecurity.payload.ApiResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentService {
@@ -18,18 +20,18 @@ public interface AppointmentService {
 
     Appointment updateAppointment(Integer appointmentId, Appointment appointment);
 
-    Appointment respondAppointment(Integer appointmentId, String action );
-
     List<Appointment> getAppointmentsByProviderId(Integer providerId);
 
     List<Appointment> getAppointmentsByUserId(Integer userId);
 
     List<Appointment> getAllAppointments();
 
+    public Appointment respondAppointment(Integer appointmentId, String action);
+
     ApiResponse cancelAppointment(Integer appointmentId);
 
     List<Appointment> getAppointmentsByStatus(String status);
 
-
+    public void sendAppointmentReminders();
 
 }

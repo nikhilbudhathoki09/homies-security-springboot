@@ -36,13 +36,12 @@ public class AppointmentController {
     }
 
     @PutMapping("/appointments/respond")
-    public ResponseEntity<Appointment> respondAppointment(@RequestParam Integer appointmentId, @RequestParam String action) {
-        try {
-            Appointment updatedAppointment = appointmentService.respondAppointment(appointmentId, action);
-            return ResponseEntity.ok(updatedAppointment);
-        } catch (CustomCommonException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Appointment> respondAppointment(@RequestParam Integer appointmentId,
+                                                          @RequestParam String action){
+
+        Appointment updatedAppointment = appointmentService.respondAppointment(appointmentId, action);
+        return ResponseEntity.ok(updatedAppointment);
+
     }
 
     @GetMapping("/appointments/{appointmentId}")
@@ -100,6 +99,7 @@ public class AppointmentController {
         List<Appointment> appointments = appointmentService.getAppointmentsByStatus(status);
         return ResponseEntity.ok(appointments);
     }
+
 
 
 

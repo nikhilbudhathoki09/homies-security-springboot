@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,13 +35,15 @@ public class Appointment {
 
     private LocalDateTime updatedAt;
 
-    private LocalDateTime appointmentDate;
+    private LocalDate appointmentDate;
 
     private String arrivalTime;
 
+    private String detailedLocation;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "provider_id")
     @JsonBackReference(value = "provider-appointment")
     private ServiceProvider provider;

@@ -9,10 +9,14 @@ import homiessecurity.exceptions.ResourceNotFoundException;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.repository.AppointmentRepository;
 import homiessecurity.service.*;
+import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -53,6 +57,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .description(appointment.getDescription())
                 .arrivalTime(appointment.getArrivalTime())
                 .appointmentDate(appointment.getArrivalDate())
+                .detailedLocation(appointment.getDetailedLocation())
                 .provider(provider)
                 .user(user)
                 .service(service)
@@ -84,23 +89,40 @@ public class AppointmentServiceImpl implements AppointmentService {
         return null;
     }
 
-    @Override
+
     public Appointment respondAppointment(Integer appointmentId, String action) {
         Appointment appointment = getAppointmentById(appointmentId);
-        switch (action) {
+
+        Status status;
+        switch (action.toUpperCase()) {
             case "ACCEPTED":
-                appointment.setStatus(Status.ACCEPTED);
+                status = Status.ACCEPTED;
                 appointment.setUpdatedAt(LocalDateTime.now());
                 break;
-            case "REJECTED":
-                appointment.setStatus(Status.REJECTED);
+            case "CANCELLED":
+                status = Status.CANCELLED;
                 appointment.setUpdatedAt(LocalDateTime.now());
                 break;
             default:
                 throw new CustomCommonException("Unsupported action for the appointment");
         }
-        return appointmentRepository.save(appointment);
+        appointment.setStatus(status);
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
+
+        ServiceProvider provider = appointment.getProvider();
+
+        if (provider != null) {
+            emailSenderService.sendAppointmentStatusEmail(appointment.getUser().getEmail(),
+                    appointment.getUser().getName(),
+                    provider.getProviderName(),
+                    status,
+                    appointment.getAppointmentDate(),
+                    appointment.getArrivalTime());
+        }
+
+        return updatedAppointment;
     }
+
 
     @Override
     public List<Appointment> getAppointmentsByProviderId(Integer providerId) {
@@ -132,7 +154,29 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public List<Appointment> getAppointmentsByStatus(String status) {
-        return appointmentRepository.findByStatus(Status.valueOf(status)).orElseThrow(() ->
+        return appointmentRepository.findByStatus(Status.valueOf(status.toUpperCase())).orElseThrow(() ->
                 new ResourceNotFoundException("Appointment", "status", status));
     }
+
+    @Transactional
+    @Scheduled(cron = "20 29 23 * * *") // Adjust cron expression as needed
+    public void sendAppointmentReminders() {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        List<Appointment> appointments = appointmentRepository.findByAppointmentDateAndStatus(tomorrow, Status.ACCEPTED);
+
+        System.out.println("Sending reminders for " + appointments.size() + " appointments");
+
+        for (Appointment appointment : appointments) {
+            try {
+                emailSenderService.sendReminderEmail( appointment);
+            } catch (Exception e) {
+                throw new CustomCommonException(e.getMessage());
+            }
+        }
+    }
+
+
+
+
+
 }

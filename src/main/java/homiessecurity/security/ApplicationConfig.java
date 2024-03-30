@@ -12,55 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Arrays;
-import java.util.List;
-
-//@Configuration
-//@RequiredArgsConstructor
-//public class ApplicationConfig {
-//
-//    private final UserServiceImpl userServiceImpl;
-//    private final ProviderServiceImpl providerServiceImpl;
-//    private final CompositeDetailsService compositeDetailsService;
-//
-//
-//    @Bean
-//    public AuthenticationProvider authenticationProvider(){
-//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-//        authProvider.setUserDetailsService(compositeDetailsService);
-//        authProvider.setPasswordEncoder(passwordEncoder());
-//
-//        return authProvider;
-//    }
-//
-//    @Bean
-//    public PasswordEncoder passwordEncoder(){
-//        return new BCryptPasswordEncoder();
-//    }
-//
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception{
-//        return configuration.getAuthenticationManager();
-//    }
-//
-//    @Bean
-//    public UserServiceImpl userService() {
-//        return userServiceImpl;
-//    }
-//
-//    @Bean
-//    public ProviderServiceImpl providerService() {
-//        return providerServiceImpl;
-//    }
-//
-//    @Bean
-//    public CompositeDetailsService compositeDetailsService() {
-//        return new CompositeDetailsService(List.of(userService(), providerService()));
-//    }
 
 @Configuration
 public class ApplicationConfig {
@@ -87,7 +40,6 @@ public class ApplicationConfig {
         authProvider.setPasswordEncoder(encoder);
         return authProvider;
     }
-
 
 
     @Bean

@@ -38,22 +38,20 @@ public class RatingServiceImpl implements RatingService {
                 new ResourceNotFoundException("Rating", "ratingId", ratingId));
     }
 
-    @Override
-    public Rating addRating(RatingRequestDto request) {
-        ServiceProvider provider = providerService.getProviderById(request.getProviderId());
-        User user = userService.getRawUserById(request.getUserId());
-
-        System.out.println(request.getComment() + " " + request.getRating() + " " + request.getProviderId() + " " + request.getUserId());
-
-        Rating rating = Rating.builder()
-                .rating(request.getRating())
-                .comment(request.getComment())
-                .provider(provider)
-                .user(user)
-                .reviewDate(LocalDateTime.now())
-                .build();
-        return this.ratingRepo.save(rating);
-    }
+//    @Override
+//    public Rating addRating(RatingRequestDto request) {
+//        ServiceProvider provider = providerService.getProviderById(request.getProviderId());
+//        User user = userService.getRawUserById(request.getUserId());
+//
+//        Rating rating = Rating.builder()
+//                .rating(request.getRating())
+//                .comment(request.getComment())
+//                .provider(provider)
+//                .user(user)
+//                .reviewDate(LocalDateTime.now())
+//                .build();
+//        return this.ratingRepo.save(rating);
+//    }
 
     @Override
     public Rating updateRating(Rating rating) {
@@ -79,4 +77,40 @@ public class RatingServiceImpl implements RatingService {
         return ratingRepo.findAllByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rating", "userId", userId));
     }
+
+    @Override
+    public Rating addRating(RatingRequestDto request) {
+        ServiceProvider provider = providerService.getProviderById(request.getProviderId());
+        User user = userService.getRawUserById(request.getUserId());
+
+        // Create a new Rating object
+        Rating rating = Rating.builder()
+                .rating(request.getRating())
+                .comment(request.getComment())
+                .provider(provider)
+                .user(user)
+                .reviewDate(LocalDateTime.now())
+                .build();
+
+        Rating savedRating = this.ratingRepo.save(rating);
+
+        Double averageRating = calculateAverageRating(provider);
+        provider.setAverageRating(averageRating);
+
+        // Save the updated ServiceProvider entity
+        providerService.saveProvider(provider);
+
+        return savedRating;
+    }
+
+    private Double calculateAverageRating(ServiceProvider provider) {
+        List<Rating> ratings = ratingRepo.findAllByProvider(provider);
+        if (ratings.isEmpty()) {
+            return 0.0;
+        }
+
+        double sum = ratings.stream().mapToInt(Rating::getRating).sum();
+        return sum / ratings.size();
+    }
+
 }
