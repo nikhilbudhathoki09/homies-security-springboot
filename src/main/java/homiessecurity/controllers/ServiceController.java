@@ -2,6 +2,7 @@ package homiessecurity.controllers;
 
 import homiessecurity.dtos.Services.ServicesDto;
 import homiessecurity.service.ServicesService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,13 +19,28 @@ public class ServiceController {
 
 
     @GetMapping("/filter-services/")
-    public List<ServicesDto> getServicesByCategoryIdAndLocationId(@RequestParam Integer categoryId, @RequestParam Integer locationId) {
-        return servicesService.getServicesByCategoryIdAndLocationId(categoryId, locationId);
+    public ResponseEntity<List<ServicesDto>> getServicesByCategoryIdAndLocationId(
+            @RequestParam Integer categoryId,
+            @RequestParam Integer locationId) {
+
+        List<ServicesDto> services = servicesService.getServicesByCategoryIdAndLocationId(categoryId, locationId);
+        return ResponseEntity.ok(services);
     }
 
     @GetMapping("/location/{locationId}")
-    public List<ServicesDto> getServicesByLocationId(@PathVariable Integer locationId) {
-        return servicesService.getServicesByLocationId(locationId);
+    public ResponseEntity<List<ServicesDto>> getServicesByLocationId(@PathVariable Integer locationId) {
+        List<ServicesDto> services = servicesService.getServicesByLocationId(locationId);
+        return ResponseEntity.ok(services);
+    }
+
+    @GetMapping("/filterByPrice")
+    public ResponseEntity<List<ServicesDto>> getServicesByPriceRangeAndCategory(
+            @RequestParam("min") Double min,
+            @RequestParam("max") Double max,
+            @RequestParam("categoryId") Integer categoryId) {
+
+        List<ServicesDto> services = servicesService.getServicesByPriceRangeAndCategoryId(min, max, categoryId);
+        return ResponseEntity.ok(services);
     }
 
 

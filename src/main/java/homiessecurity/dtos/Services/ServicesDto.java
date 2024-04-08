@@ -23,4 +23,6 @@ public class ServicesDto {
 
     private ServiceProvider provider;
 
+    private String serviceImage;
+
 }

@@ -15,7 +15,6 @@ public interface ServicesRepository extends JpaRepository<Services, Integer>{
 
     Optional<List<Services>> findByCategoryTitle(String categoryName);
 
-
     @Query("SELECT s FROM Services s WHERE s.provider.providerId = ?1")
     Optional<List<Services>> findByProviderId(Integer providerId);
 
@@ -32,6 +31,11 @@ public interface ServicesRepository extends JpaRepository<Services, Integer>{
     List<Services> findServicesByProviderLocationId(@Param("locationId") Integer locationId);
 
 
+    List<Services> findByPerHourRateBetween(Double minPrice, Double maxPrice);
+
+
+    @Query("SELECT s FROM Services s WHERE s.perHourRate BETWEEN :min AND :max AND s.category.id = :categoryId")
+    List<Services> findByPerHourRateBetweenAndCategory(@Param("min") Double min, @Param("max") Double max, @Param("categoryId") Integer categoryId);
 
 
 

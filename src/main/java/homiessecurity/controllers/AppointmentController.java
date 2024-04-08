@@ -6,10 +6,12 @@ import homiessecurity.entities.Appointment;
 import homiessecurity.exceptions.CustomCommonException;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.service.AppointmentService;
+import homiessecurity.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,10 +21,12 @@ import java.util.List;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
+    private final CloudinaryService cloudinaryService;
 
     @Autowired
-    public AppointmentController(AppointmentService appointmentService) {
+    public AppointmentController(AppointmentService appointmentService,CloudinaryService cloudinaryService) {
         this.appointmentService = appointmentService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @PostMapping("/create-appointment")
@@ -30,7 +34,13 @@ public class AppointmentController {
             @RequestParam("userId") Integer userId,
             @RequestParam("providerId") Integer providerId,
             @RequestParam("serviceId") Integer serviceId,
-            @RequestBody AppointmentRequestDto appointmentRequestDto) {
+            @ModelAttribute AppointmentRequestDto appointmentRequestDto,
+            @RequestParam(value = "appointmentImage", required = false) MultipartFile appointmentImage) {
+
+        if (appointmentImage != null) {
+            String imageUrl = cloudinaryService.uploadImage(appointmentImage, "appointmentImages");
+            appointmentRequestDto.setAppointmentImageUrl(imageUrl); // Set the image URL in the DTO
+        }
         Appointment newAppointment = appointmentService.addAppointment(appointmentRequestDto, userId, providerId, serviceId);
         return new ResponseEntity<>(newAppointment, HttpStatus.CREATED);
     }

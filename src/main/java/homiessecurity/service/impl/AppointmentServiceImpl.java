@@ -48,10 +48,15 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Appointment addAppointment(AppointmentRequestDto appointment, Integer userId, Integer providerId
                                         ,Integer serviceId) {
+
+        String imageUrl = null;
         ServiceProvider provider = providerService.getProviderById(providerId);
         User user = userService.getRawUserById(userId);
         Services service = servicesService.getServiceById(serviceId);
 
+        if (appointment.getAppointmentImageUrl() != null) {
+            imageUrl = appointment.getAppointmentImageUrl();
+        }
 
         Appointment new_appointment = Appointment.builder()
                 .description(appointment.getDescription())
@@ -59,6 +64,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .appointmentDate(appointment.getArrivalDate())
                 .detailedLocation(appointment.getDetailedLocation())
                 .provider(provider)
+                .appointmentImage(imageUrl)
                 .user(user)
                 .service(service)
                 .status(Status.PENDING)
@@ -159,7 +165,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Transactional
-    @Scheduled(cron = "20 29 23 * * *") // Adjust cron expression as needed
+    @Scheduled(cron = "00 00 18 * * *") // Adjust cron expression as needed
     public void sendAppointmentReminders() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         List<Appointment> appointments = appointmentRepository.findByAppointmentDateAndStatus(tomorrow, Status.ACCEPTED);

@@ -35,7 +35,6 @@ public class CategoryServiceImpl implements CategoryService {
         if(category.getCategoryImage() != null){
              imageUrl = this.cloudinary.uploadImage(category.getCategoryImage(), "Categories");
         }
-        System.out.println("Image URL: " + imageUrl);
         ServiceCategory serviceCategory = ServiceCategory.builder().
                 title(category.getTitle()).
                 description(category.getDescription()).

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ServicesServiceImpl implements ServicesService {
@@ -190,11 +191,6 @@ public class ServicesServiceImpl implements ServicesService {
 
 
     @Override
-    public List<ServicesDto> filterServicesByCategory(String category) {
-        return null;
-    }
-
-    @Override
     public List<ServicesDto> getTopRatedServices() {
         return null;
     }
@@ -206,12 +202,18 @@ public class ServicesServiceImpl implements ServicesService {
 
     @Override
     public List<ServicesDto> getServicesByPriceRange(Double min, Double max) {
-        return null;
+        List<Services> services = servicesRepo.findByPerHourRateBetween(min, max);
+        return services.stream()
+                .map(service -> modelMapper.map(service, ServicesDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<ServicesDto> getServicesByProviderName(String name) {
-        return null;
+    public List<ServicesDto> getServicesByPriceRangeAndCategoryId(Double min, Double max, Integer categoryId) {
+        List<Services> services = servicesRepo.findByPerHourRateBetweenAndCategory(min, max, categoryId);
+        return services.stream()
+                .map(service -> modelMapper.map(service, ServicesDto.class))
+                .collect(Collectors.toList());
     }
 
 
