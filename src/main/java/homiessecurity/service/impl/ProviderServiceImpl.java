@@ -240,8 +240,8 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
         providerDto.setPhoneNumber(serviceProvider.getPhoneNumber());
         providerDto.setAddress(serviceProvider.getAddress());
         providerDto.setStatus(serviceProvider.getStatus().toString());
-        providerDto.setAllServices(serviceProvider.getAllServices());
         providerDto.setCategory(serviceProvider.getCategory());
+        providerDto.setAllServices(serviceProvider.getAllServices());
         providerDto.setYearOfExperience(serviceProvider.getYearOfExperience());
         providerDto.setMinServicePrice(serviceProvider.getMinServicePrice());
         providerDto.setMaxServicePrice(serviceProvider.getMaxServicePrice());
@@ -291,7 +291,7 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
             List<Integer> suggestedProviderIds = response.getBody().get("suggested_provider_ids");
             return suggestedProviderIds;
         } catch (HttpClientErrorException.NotFound e) {
-            System.out.println("Provider not found: " + e.getMessage());
+            
             throw new ResourceNotFoundException("Provider", "providerId", providerId);
         }
     }

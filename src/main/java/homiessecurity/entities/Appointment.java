@@ -41,8 +41,6 @@ public class Appointment {
 
     private String detailedLocation;
 
-
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "provider_id")
     @JsonBackReference(value = "provider-appointment")
@@ -58,7 +56,5 @@ public class Appointment {
     @JoinColumn(name = "service_id")
     @JsonBackReference(value = "service-appointment")
     private Services service;
-
-
 
 }

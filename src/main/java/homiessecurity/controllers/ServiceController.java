@@ -43,5 +43,15 @@ public class ServiceController {
         return ResponseEntity.ok(services);
     }
 
+    @GetMapping("/sortByRatings")
+    public ResponseEntity<List<ServicesDto>> getServicesByCategorySortedByRating(
+            @RequestParam("categoryId") Integer categoryId) {
+        List<ServicesDto> services = servicesService.getServicesByCategoryWithRatings(categoryId);
+        if (services.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(services);
+    }
+
 
 }

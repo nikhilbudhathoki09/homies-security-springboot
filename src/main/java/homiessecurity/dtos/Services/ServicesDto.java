@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class ServicesDto {
 
+    private Integer id;
+
     private String serviceName;
 
     private String description;

@@ -25,13 +25,11 @@ public class ProviderDto {
     private String phoneNumber;
     private String address;
     private String status;
-
-    private List<Services> allServices;
     private ServiceCategory category;
+    private List<Services> allServices;
     private double yearOfExperience;
     private double minServicePrice;
     private double maxServicePrice;
     private Locations location;
-
 
 }

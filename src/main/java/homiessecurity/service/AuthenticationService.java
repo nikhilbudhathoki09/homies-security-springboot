@@ -97,7 +97,6 @@ public class AuthenticationService {
 //                    emailResponse.getVerificationToken());
 //
 //        }catch (MessagingException e){
-//            System.out.println("Error sending email");
 //            throw new RuntimeException(e);
 //        }
 

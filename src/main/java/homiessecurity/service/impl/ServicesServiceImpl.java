@@ -189,28 +189,17 @@ public class ServicesServiceImpl implements ServicesService {
 
 
 
-
     @Override
-    public List<ServicesDto> getTopRatedServices() {
-        return null;
-    }
-
-    @Override
-    public List<ServicesDto> getTopRatedServicesByCategory(String category) {
-        return null;
-    }
-
-    @Override
-    public List<ServicesDto> getServicesByPriceRange(Double min, Double max) {
-        List<Services> services = servicesRepo.findByPerHourRateBetween(min, max);
+    public List<ServicesDto> getServicesByPriceRangeAndCategoryId(Double min, Double max, Integer categoryId) {
+        List<Services> services = servicesRepo.findByPerHourRateBetweenAndCategory(min, max, categoryId);
         return services.stream()
                 .map(service -> modelMapper.map(service, ServicesDto.class))
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<ServicesDto> getServicesByPriceRangeAndCategoryId(Double min, Double max, Integer categoryId) {
-        List<Services> services = servicesRepo.findByPerHourRateBetweenAndCategory(min, max, categoryId);
+
+    public List<ServicesDto> getServicesByCategoryWithRatings(Integer categoryId) {
+        List<Services> services = servicesRepo.findByCategoryIdOrderByProviderRatingDesc(categoryId);
         return services.stream()
                 .map(service -> modelMapper.map(service, ServicesDto.class))
                 .collect(Collectors.toList());

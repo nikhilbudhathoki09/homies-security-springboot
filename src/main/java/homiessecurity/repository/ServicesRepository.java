@@ -37,6 +37,10 @@ public interface ServicesRepository extends JpaRepository<Services, Integer>{
     @Query("SELECT s FROM Services s WHERE s.perHourRate BETWEEN :min AND :max AND s.category.id = :categoryId")
     List<Services> findByPerHourRateBetweenAndCategory(@Param("min") Double min, @Param("max") Double max, @Param("categoryId") Integer categoryId);
 
+    @Query("SELECT s FROM Services s WHERE s.category.id = :categoryId ORDER BY s.provider.averageRating DESC")
+    List<Services> findByCategoryIdOrderByProviderRatingDesc(@Param("categoryId") Integer categoryId);
+
+
 
 
 

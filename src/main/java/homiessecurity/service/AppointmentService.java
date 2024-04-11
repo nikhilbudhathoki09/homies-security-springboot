@@ -24,6 +24,8 @@ public interface AppointmentService {
 
     List<Appointment> getAppointmentsByUserId(Integer userId);
 
+    List<Appointment> getIncomingAppointmentsByProviderId(Integer providerId);
+
     List<Appointment> getAllAppointments();
 
     public Appointment respondAppointment(Integer appointmentId, String action);

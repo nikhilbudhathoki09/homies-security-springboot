@@ -110,6 +110,12 @@ public class AppointmentController {
         return ResponseEntity.ok(appointments);
     }
 
+    @GetMapping("/appointments/incoming-requests")
+    public ResponseEntity<List<Appointment>> getIncomingAppointmentsByProviderId(@RequestParam("providerId") Integer providerId) {
+        List<Appointment> appointments = appointmentService.getIncomingAppointmentsByProviderId(providerId);
+        return ResponseEntity.ok(appointments);
+    }
+
 
 
 

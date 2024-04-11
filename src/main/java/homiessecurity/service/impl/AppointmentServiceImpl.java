@@ -145,6 +145,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    public List<Appointment> getIncomingAppointmentsByProviderId(Integer providerId) {
+        return appointmentRepository.findByProviderIdAndStatus(providerId, Status.PENDING).orElseThrow(() ->
+                new ResourceNotFoundException("Appointment", "status", "ACCEPTED"));
+    }
+
+    @Override
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
@@ -165,12 +171,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Transactional
-    @Scheduled(cron = "00 00 18 * * *") // Adjust cron expression as needed
+    @Scheduled(cron = "00 00 18 * * *")
     public void sendAppointmentReminders() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         List<Appointment> appointments = appointmentRepository.findByAppointmentDateAndStatus(tomorrow, Status.ACCEPTED);
-
-        System.out.println("Sending reminders for " + appointments.size() + " appointments");
 
         for (Appointment appointment : appointments) {
             try {
