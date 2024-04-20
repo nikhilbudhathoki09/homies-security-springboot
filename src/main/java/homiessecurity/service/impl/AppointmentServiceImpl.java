@@ -109,6 +109,10 @@ public class AppointmentServiceImpl implements AppointmentService {
                 status = Status.CANCELLED;
                 appointment.setUpdatedAt(LocalDateTime.now());
                 break;
+            case "COMPLETED":
+                status = Status.COMPLETED;
+                appointment.setUpdatedAt(LocalDateTime.now());
+                break;
             default:
                 throw new CustomCommonException("Unsupported action for the appointment");
         }
@@ -155,14 +159,34 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentRepository.findAll();
     }
 
+//    @Override
+//    public ApiResponse cancelAppointment(Integer appointmentId) {
+//        Appointment appointment = getAppointmentById(appointmentId);
+//        appointment.setStatus(Status.CANCELLED);
+//        appointment.setUpdatedAt(LocalDateTime.now());
+//        appointmentRepository.save(appointment);
+//        return new ApiResponse("Appointment cancelled successfully",true);
+//    }
+
     @Override
     public ApiResponse cancelAppointment(Integer appointmentId) {
         Appointment appointment = getAppointmentById(appointmentId);
+
+        // Check if the appointment can be cancelled based on the time difference
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime cancellationDeadline = appointment.getCreatedAt().plusMinutes(30);
+        if (now.isAfter(cancellationDeadline)) {
+            // If the current time is after the cancellation deadline, return an error response
+            return new ApiResponse("Cannot cancel appointment after 30 minutes ", false);
+        }
+
+        // If the appointment can be cancelled, proceed with the cancellation
         appointment.setStatus(Status.CANCELLED);
-        appointment.setUpdatedAt(LocalDateTime.now());
+        appointment.setUpdatedAt(now);
         appointmentRepository.save(appointment);
-        return new ApiResponse("Appointment cancelled successfully",true);
+        return new ApiResponse("Appointment cancelled successfully", true);
     }
+
 
     @Override
     public List<Appointment> getAppointmentsByStatus(String status) {

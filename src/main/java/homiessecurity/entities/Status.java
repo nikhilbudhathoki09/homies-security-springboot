@@ -8,4 +8,5 @@ public enum Status {
     //this one is for the appointments
     CANCELLED,
     ACCEPTED,
+    COMPLETED
 }

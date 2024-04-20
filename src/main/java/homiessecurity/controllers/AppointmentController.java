@@ -7,6 +7,7 @@ import homiessecurity.exceptions.CustomCommonException;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.service.AppointmentService;
 import homiessecurity.service.CloudinaryService;
+import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,9 +47,8 @@ public class AppointmentController {
     }
 
     @PutMapping("/appointments/respond")
-    public ResponseEntity<Appointment> respondAppointment(@RequestParam Integer appointmentId,
-                                                          @RequestParam String action){
-
+    public ResponseEntity<Appointment> respondAppointment(@RequestParam("appointmentId") Integer appointmentId,
+                                                          @RequestParam("action") String action){
         Appointment updatedAppointment = appointmentService.respondAppointment(appointmentId, action);
         return ResponseEntity.ok(updatedAppointment);
 
