@@ -25,6 +25,7 @@ public class ProviderDto {
     private String phoneNumber;
     private String address;
     private String status;
+    private String providerImage;
     private ServiceCategory category;
     private List<Services> allServices;
     private double yearOfExperience;

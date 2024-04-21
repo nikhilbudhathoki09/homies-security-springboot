@@ -42,14 +42,15 @@ public class Appointment {
     private String detailedLocation;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "provider_id")
+    @JoinColumn(name = "provider_id",referencedColumnName = "id")
     @JsonBackReference(value = "provider-appointment")
-    private ServiceProvider provider;
+    ServiceProvider provider;
 
+
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
     @JsonBackReference(value = "user-appointment")
-    private User user;
+    User user;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

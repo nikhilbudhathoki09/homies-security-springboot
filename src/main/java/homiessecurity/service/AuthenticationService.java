@@ -89,16 +89,16 @@ public class AuthenticationService {
         //verifying the user email which returns(otp and verification token)
         EmailVerificationResponse emailResponse = emailVerificationService.getEmailVerification(savedUser);
 
-//        try {
-//            //sending the email to the user with verification link to get verified
-//            emailSenderService.sendVerificationEmail(savedUser.getEmail(),
-//                    savedUser.getName(),
-//                    "Verify your email",
-//                    emailResponse.getVerificationToken());
-//
-//        }catch (MessagingException e){
-//            throw new RuntimeException(e);
-//        }
+        try {
+            //sending the email to the user with verification link to get verified
+            emailSenderService.sendVerificationEmail(savedUser.getEmail(),
+                    savedUser.getName(),
+                    "Verify your email",
+                    emailResponse.getVerificationToken());
+
+        }catch (MessagingException e){
+            throw new RuntimeException(e);
+        }
 
         return new ApiResponse("User Registered. Please verify your email to proceed.", true);
     }
@@ -172,17 +172,17 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(requestedProvider);
         EmailVerificationResponse emailResponse = emailVerificationService.getEmailVerification(requestedProvider);
 
-//        try {
-//            emailSenderService.sendProviderVerificationEmail(
-//                    requestedProvider.getEmail(),
-//                    requestedProvider.getProviderName(),
-//                    "Verify your email",
-//                    emailResponse.getVerificationToken()
-//            );
-//        } catch (MessagingException e) {
-//            System.out.println("Error sending email");
-//            throw new RuntimeException(e);
-//        }
+        try {
+            emailSenderService.sendProviderVerificationEmail(
+                    requestedProvider.getEmail(),
+                    requestedProvider.getProviderName(),
+                    "Verify your email",
+                    emailResponse.getVerificationToken()
+            );
+        } catch (MessagingException e) {
+            System.out.println("Error sending email");
+            throw new RuntimeException(e);
+        }
 
         return providerService.mapToProviderDto(requestedProvider);
     }
@@ -206,7 +206,7 @@ public class AuthenticationService {
             var provider = providerService.loadUserByUsername(request.getEmail());
             ServiceProvider newProvider = providerService.getServiceProviderByEmail(request.getEmail());
 
-            if (!newProvider.isVerified()) {
+            if (!newProvider.isVerified())  {
                 throw new CustomAuthenticationException("Provider is not verified. Please verify your email.");
             }
 

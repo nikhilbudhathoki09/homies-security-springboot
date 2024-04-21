@@ -99,7 +99,7 @@ public class ServiceProvider implements UserDetails {
     @JsonBackReference(value = "category_providers")
     private ServiceCategory category;
 
-    @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference(value = "provider-appointment")
     private List<Appointment> appointments = new ArrayList<>();
 

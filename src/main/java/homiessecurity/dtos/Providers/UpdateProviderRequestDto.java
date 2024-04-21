@@ -22,10 +22,6 @@ public class UpdateProviderRequestDto {
 
     @Size(min = 10, max = 100, message = "Address must be between 10 and 100 characters")
     private String address;
-
-//    @Nullable
-//    private MultipartFile providerImage;
-
     private String providerImageUrl;
     private Double yearOfExperience;
     private Double minServicePrice;

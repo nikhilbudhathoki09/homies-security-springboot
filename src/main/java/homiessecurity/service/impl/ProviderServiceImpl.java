@@ -239,6 +239,7 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
         providerDto.setDescription(serviceProvider.getDescription());
         providerDto.setPhoneNumber(serviceProvider.getPhoneNumber());
         providerDto.setAddress(serviceProvider.getAddress());
+        providerDto.setProviderImage(serviceProvider.getProviderImage());
         providerDto.setStatus(serviceProvider.getStatus().toString());
         providerDto.setCategory(serviceProvider.getCategory());
         providerDto.setAllServices(serviceProvider.getAllServices());
