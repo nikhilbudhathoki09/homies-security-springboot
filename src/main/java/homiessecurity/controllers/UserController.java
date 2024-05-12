@@ -46,7 +46,7 @@ public class UserController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateUser(@PathVariable Integer userId,
-                                        @ModelAttribute UpdateUserDto updateUserDto,
+                                        @RequestBody UpdateUserDto updateUserDto,
                                         @RequestParam(value = "userImage", required = false) MultipartFile userImage) {
         if (userImage != null) {
             String imageUrl = cloudinaryService.uploadImage(userImage, "UserImages");

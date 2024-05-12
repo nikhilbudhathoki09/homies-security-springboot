@@ -67,12 +67,14 @@ public class ProviderController {
 
     @PutMapping("/{providerId}")
     public ResponseEntity<?> updateServiceProvider(@PathVariable int providerId,
-                                                   @ModelAttribute UpdateProviderRequestDto updateDto,
+                                                   @RequestBody UpdateProviderRequestDto updateDto,
                                                    @RequestParam(value = "providerImage", required = false) MultipartFile providerImage) {
         if (providerImage != null) {
             String imageUrl = cloudinaryService.uploadImage(providerImage, "ProviderImages");
             updateDto.setProviderImageUrl(imageUrl); // Set the image URL in the DTO
         }
+
+        System.out.println(updateDto);
 
         ProviderDto updatedProviderDto = providerService.updateServiceProvider(providerId, updateDto);
         return ResponseEntity.ok(updatedProviderDto);

@@ -269,6 +269,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             khaltiInitiationRequest.setCustomerInfo(customerInfo);
 
             KhaltiResponseDTO res =  this.khaltiPayment.callKhalti(khaltiInitiationRequest);
+            res.setAppointmentId(appointment1.getAppointmentId());
             System.out.println(res.getPidx());
             System.out.println(res.getPayment_url());
             System.out.println(res.getExpires_at());

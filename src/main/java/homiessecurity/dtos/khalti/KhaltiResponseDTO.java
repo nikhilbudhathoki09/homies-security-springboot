@@ -20,13 +20,17 @@ public class KhaltiResponseDTO {
 
     private String expires_in;
 
+    private Integer appointmentId;
+
     public KhaltiResponseDTO() {
     }
 
-    public KhaltiResponseDTO(String pidx, String payment_url, String expires_at, String expires_in) {
+    public KhaltiResponseDTO(String pidx, String payment_url, String expires_at,
+                             String expires_in, Integer appointmentId) {
         this.pidx = pidx;
         this.payment_url = payment_url;
         this.expires_at = expires_at;
         this.expires_in = expires_in;
+        this.appointmentId = appointmentId;
     }
 }

@@ -21,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class ServiceProvider implements UserDetails {
 
     @Id

@@ -69,7 +69,7 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
 
         ServiceProvider provider = getProviderById(providerId);
 
-        // Update the fields
+
         if (updateDto.getProviderName() != null) {
             provider.setProviderName(updateDto.getProviderName());
         }
@@ -111,6 +111,7 @@ public class ProviderServiceImpl implements ProviderService, UserDetailsService 
 
 
         provider.setUpdatedAt(LocalDateTime.now());
+        System.out.println(provider);
         ServiceProvider updatedProvider = providerRepo.save(provider);
         return modelMapper.map(updatedProvider, ProviderDto.class);
 
