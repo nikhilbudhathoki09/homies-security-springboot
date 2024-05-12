@@ -60,7 +60,7 @@ public ResponseEntity<KhaltiResponseDTO> createAppointment(
         appointmentRequestDto.setAppointmentImageUrl(imageUrl); // Set the image URL in the DTO
     }
     KhaltiResponseDTO res = appointmentService.addAppointment(appointmentRequestDto, userId, providerId, serviceId);
-    return new ResponseEntity<>(res, HttpStatus.CREATED);
+    return new ResponseEntity<KhaltiResponseDTO>(res, HttpStatus.CREATED);
 }
 
 

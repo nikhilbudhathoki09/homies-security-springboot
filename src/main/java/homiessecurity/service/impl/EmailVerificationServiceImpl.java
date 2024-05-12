@@ -211,7 +211,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         EmailVerification verification =  emailVerificationRepo.findByVerificationToken(token)
                 .orElseThrow(() -> new CustomCommonException("Invalid or expired token"));
 
-        if (LocalDateTime.now().isAfter(verification.getSentAt().plusMinutes(1))) {
+        if (LocalDateTime.now().isAfter(verification.getSentAt().plusMinutes(5))) {
             throw new CustomCommonException("Token is already expired");
         }
         return verification;

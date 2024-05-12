@@ -267,6 +267,9 @@ public class AppointmentServiceImpl implements AppointmentService {
             System.out.println(res.getPidx());
             System.out.println(res.getPayment_url());
             System.out.println(res.getExpires_at());
+
+            return res;
+
         } catch (JsonProcessingException e) {
             System.out.println("Error processing JSON");
         throw new RuntimeException("Error processing JSON", e);
@@ -277,7 +280,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             System.out.println("Unexpected error");
         throw new RuntimeException("Unexpected error", e);
     }
-        return null;
+
     }
 
 

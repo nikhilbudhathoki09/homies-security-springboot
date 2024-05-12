@@ -103,7 +103,7 @@ public class AuthController {
     @PostMapping("/user/reset-password")
     public ResponseEntity<?> resetUserPassword(@RequestParam String token, @RequestBody PasswordResetRequest passwordResetRequest) {
         emailService.resetUserPassword(token, passwordResetRequest.getNewPassword());
-        return ResponseEntity.ok("Your password has been successfully reset.");
+        return new ResponseEntity<ApiResponse>(new ApiResponse("Your password has been successfully reset.", true), HttpStatus.OK);
     }
 
     // Endpoint to initiate a password reset request for a ServiceProvider
@@ -117,7 +117,7 @@ public class AuthController {
     @PostMapping("/provider/reset-password")
     public ResponseEntity<?> resetProviderPassword(@RequestParam String token, @RequestBody PasswordResetRequest passwordResetRequest) {
         emailService.resetProviderPassword(token, passwordResetRequest.getNewPassword());
-        return ResponseEntity.ok("Your password has been successfully reset.");
+        return new ResponseEntity<ApiResponse>(new ApiResponse("Your password has been successfully reset.", true), HttpStatus.OK);
     }
 
 }
