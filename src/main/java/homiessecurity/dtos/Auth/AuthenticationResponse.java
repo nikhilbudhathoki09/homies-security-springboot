@@ -19,6 +19,7 @@ public class AuthenticationResponse {
     private String accessToken;
 
 
+    private boolean isAdmin;
     private UserDto user;
 
     private ServiceProvider provider;

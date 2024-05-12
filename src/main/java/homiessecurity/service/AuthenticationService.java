@@ -122,9 +122,17 @@ public class AuthenticationService {
                 throw new CustomAuthenticationException("User is not verified. Please verify your email.");
             }
 
+            boolean isAdmin = false;
+            for (Role role :
+                    newUser.getUserRoles()) {
+
+                if(role.getTitle().equals("Admin"))isAdmin=true;
+
+            }
             var jwtToken = jwtService.generateToken(user);
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
+                    .isAdmin(isAdmin)
                     .user(modelMapper.map(newUser, UserDto.class))
                     .build();
         } catch (BadCredentialsException e) {
