@@ -12,6 +12,7 @@ import homiessecurity.exceptions.CustomCommonException;
 import homiessecurity.exceptions.ResourceNotFoundException;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.repository.AppointmentRepository;
+import homiessecurity.repository.PaymentRepository;
 import homiessecurity.service.*;
 import homiessecurity.utils.KhaltiPayment;
 import jakarta.mail.MessagingException;
@@ -40,11 +41,14 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private final KhaltiPayment khaltiPayment;
 
+    private final PaymentRepository paymentRepository;
+
     @Autowired
     public AppointmentServiceImpl(ProviderService providerService, UserService userService,
                                   AppointmentRepository appointmentRepository, ModelMapper modelMapper,
                                   CloudinaryService cloudinaryService,ServicesService servicesService,
-                                  EmailSenderService emailSenderService, KhaltiPayment khaltiPayment){
+                                  EmailSenderService emailSenderService, KhaltiPayment khaltiPayment
+                                ,PaymentRepository paymentRepository){
         this.providerService=providerService;
         this.userService=userService;
         this.appointmentRepository=appointmentRepository;
@@ -53,6 +57,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.emailSenderService=emailSenderService;
         this.servicesService = servicesService;
         this.khaltiPayment = khaltiPayment;
+        this.paymentRepository = paymentRepository;
     }
 //    @Override
 //    public Appointment addAppointment(AppointmentRequestDto appointment, Integer userId, Integer providerId
@@ -259,7 +264,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 
 
-            CustomerInfo customerInfo = new CustomerInfo(user.getUsername(), user.getUsername(), user.getUsername(), user.getEmail(), user.getPhoneNumber(), user.getAddress());
+            CustomerInfo customerInfo = new CustomerInfo(user.getName(), user.getUsername(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getAddress());
 
             khaltiInitiationRequest.setCustomerInfo(customerInfo);
 
@@ -298,15 +303,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .productIdentity("productIdentity")
                 .productName(appointment.getService().getServiceName())
                 .build();
-        return "Payment table updated";
 
+        this.paymentRepository.save(payment);
+        return "Successful enter";
     }
-
-
-
-
-
-
-
 
 }

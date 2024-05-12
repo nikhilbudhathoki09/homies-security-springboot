@@ -135,29 +135,24 @@ public ResponseEntity<KhaltiResponseDTO> createAppointment(
         return ResponseEntity.ok(appointments);
     }
 
-//    @PostMapping("/khalti/update")
-//    public ResponseEntity<?> updateKhalti(
-//            @RequestParam(name = "pidx") String pidx,
-//            @RequestParam(name = "status") String status,
-//            @RequestParam(name = "bookingId") String bookingId,
-//            @RequestParam(name = "totalAmount") long totalAmount
-//    ){
-//        try {
-//            String res = this.appointmentService.updatePaymentTable(pidx, appointmentId);
-//            if (Objects.equals(res, "SuccessFull enter")) {
-//                ApiResponse apiResponse = new ApiResponse<>(200, "success", res);
-//                return ResponseEntity.ok().body(apiResponse);
-//            } else {
-//                // Handle the case where the update operation was not successful
-//                ApiResponse<String> apiResponse = new ApiResponse<>(400, "failure", "Failed to update payment table");
-//                return ResponseEntity.badRequest().body(apiResponse);
-//            }
-//        } catch (Exception e) {
-//            // Handle exceptions
-//            ApiResponse<String> apiResponse = new ApiResponse<>(500, "error", "An error occurred");
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
-//        }
-//    }
+    @PostMapping("/khalti/update")
+    public ResponseEntity<ApiResponse> updateKhalti(
+            @RequestParam(name = "pidx") String pidx,
+            @RequestParam(name = "appointmentId") Integer appointmentId
+    ) {
+        try {
+            String res = appointmentService.updatePaymentTable(pidx, appointmentId);
+            if ("Successful enter".equals(res)) {
+                return ResponseEntity.ok(new ApiResponse("Payment successfully updated", true));
+            } else {
+                return ResponseEntity.badRequest().body(new ApiResponse("Failed to update payment table", false));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), false));
+        }
+    }
+
+
 
 
 
