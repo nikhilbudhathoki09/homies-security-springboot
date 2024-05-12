@@ -32,6 +32,8 @@ public interface EmailSenderService {
 
     public void sendReminderEmail(Appointment appointment);
 
+    public void sendNewRequestEmail(Appointment appointment);
+
 
 
 

@@ -1,20 +1,26 @@
 package homiessecurity.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import homiessecurity.dtos.Appointments.AppointmentDto;
 import homiessecurity.dtos.Appointments.AppointmentRequestDto;
 import homiessecurity.dtos.Users.UserDto;
+import homiessecurity.dtos.khalti.CustomerInfo;
+import homiessecurity.dtos.khalti.KhaltiInitiationRequest;
+import homiessecurity.dtos.khalti.KhaltiResponseDTO;
 import homiessecurity.entities.*;
 import homiessecurity.exceptions.CustomCommonException;
 import homiessecurity.exceptions.ResourceNotFoundException;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.repository.AppointmentRepository;
 import homiessecurity.service.*;
+import homiessecurity.utils.KhaltiPayment;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,11 +38,13 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final CloudinaryService cloudinaryService;
     private final EmailSenderService emailSenderService;
 
+    private final KhaltiPayment khaltiPayment;
+
     @Autowired
     public AppointmentServiceImpl(ProviderService providerService, UserService userService,
                                   AppointmentRepository appointmentRepository, ModelMapper modelMapper,
                                   CloudinaryService cloudinaryService,ServicesService servicesService,
-                                  EmailSenderService emailSenderService){
+                                  EmailSenderService emailSenderService, KhaltiPayment khaltiPayment){
         this.providerService=providerService;
         this.userService=userService;
         this.appointmentRepository=appointmentRepository;
@@ -44,37 +52,38 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.cloudinaryService=cloudinaryService;
         this.emailSenderService=emailSenderService;
         this.servicesService = servicesService;
+        this.khaltiPayment = khaltiPayment;
     }
-    @Override
-    public Appointment addAppointment(AppointmentRequestDto appointment, Integer userId, Integer providerId
-                                        ,Integer serviceId) {
-
-        String imageUrl = null;
-        ServiceProvider provider = providerService.getProviderById(providerId);
-        User user = userService.getRawUserById(userId);
-        Services service = servicesService.getServiceById(serviceId);
-
-        if (appointment.getAppointmentImageUrl() != null) {
-            imageUrl = appointment.getAppointmentImageUrl();
-        }
-
-        Appointment new_appointment = Appointment.builder()
-                .description(appointment.getDescription())
-                .arrivalTime(appointment.getArrivalTime())
-                .appointmentDate(appointment.getArrivalDate())
-                .detailedLocation(appointment.getDetailedLocation())
-                .provider(provider)
-                .appointmentImage(imageUrl)
-                .user(user)
-                .service(service)
-                .status(Status.PENDING)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-
-        return appointmentRepository.save(new_appointment);
-    }
+//    @Override
+//    public Appointment addAppointment(AppointmentRequestDto appointment, Integer userId, Integer providerId
+//                                        ,Integer serviceId) {
+//
+//        String imageUrl = null;
+//        ServiceProvider provider = providerService.getProviderById(providerId);
+//        User user = userService.getRawUserById(userId);
+//        Services service = servicesService.getServiceById(serviceId);
+//
+//        if (appointment.getAppointmentImageUrl() != null) {
+//            imageUrl = appointment.getAppointmentImageUrl();
+//        }
+//
+//        Appointment new_appointment = Appointment.builder()
+//                .description(appointment.getDescription())
+//                .arrivalTime(appointment.getArrivalTime())
+//                .appointmentDate(appointment.getArrivalDate())
+//                .detailedLocation(appointment.getDetailedLocation())
+//                .provider(provider)
+//                .appointmentImage(imageUrl)
+//                .user(user)
+//                .service(service)
+//                .status(Status.PENDING)
+//                .createdAt(LocalDateTime.now())
+//                .updatedAt(LocalDateTime.now())
+//                .build();
+//
+//        emailSenderService.sendNewRequestEmail(new_appointment);
+//        return appointmentRepository.save(new_appointment);
+//    }
 
     @Override
     public Appointment getAppointmentById(Integer appointmentId) {
@@ -159,14 +168,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentRepository.findAll();
     }
 
-//    @Override
-//    public ApiResponse cancelAppointment(Integer appointmentId) {
-//        Appointment appointment = getAppointmentById(appointmentId);
-//        appointment.setStatus(Status.CANCELLED);
-//        appointment.setUpdatedAt(LocalDateTime.now());
-//        appointmentRepository.save(appointment);
-//        return new ApiResponse("Appointment cancelled successfully",true);
-//    }
 
     @Override
     public ApiResponse cancelAppointment(Integer appointmentId) {
@@ -195,10 +196,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Transactional
-    @Scheduled(cron = "00 00 18 * * *")
+    @Scheduled(cron = "00 00 03 * * *")
     public void sendAppointmentReminders() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        List<Appointment> appointments = appointmentRepository.findByAppointmentDateAndStatus(tomorrow, Status.ACCEPTED);
+        List<Appointment> appointments = appointmentRepository.findByAppointmentDateAndStatus(tomorrow,
+                Status.ACCEPTED);
 
         for (Appointment appointment : appointments) {
             try {
@@ -208,6 +210,97 @@ public class AppointmentServiceImpl implements AppointmentService {
             }
         }
     }
+
+    @Override
+    public KhaltiResponseDTO addAppointment(AppointmentRequestDto appointment, Integer userId, Integer providerId
+            , Integer serviceId) {
+
+        try{
+            String imageUrl = null;
+            ServiceProvider provider = providerService.getProviderById(providerId);
+            User user = userService.getRawUserById(userId);
+            Services service = servicesService.getServiceById(serviceId);
+
+            if (appointment.getAppointmentImageUrl() != null) {
+                imageUrl = appointment.getAppointmentImageUrl();
+            }
+
+            Appointment new_appointment = Appointment.builder()
+                    .description(appointment.getDescription())
+                    .arrivalTime(appointment.getArrivalTime())
+                    .appointmentDate(appointment.getArrivalDate())
+                    .detailedLocation(appointment.getDetailedLocation())
+                    .provider(provider)
+                    .appointmentImage(imageUrl)
+                    .user(user)
+                    .service(service)
+                    .status(Status.PENDING)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            emailSenderService.sendNewRequestEmail(new_appointment);
+            Appointment appointment1 = appointmentRepository.save(new_appointment);
+
+            KhaltiInitiationRequest khaltiInitiationRequest = new KhaltiInitiationRequest();
+
+            String return_url = "http://localhost:5173/appointments";
+            String website_url = "http://localhost:5173/";
+
+            khaltiInitiationRequest.setReturn_url(return_url);
+            khaltiInitiationRequest.setWebsite_url(website_url);
+            double khaltiTotalAmount = appointment1.getService().getPerHourRate()* 100;
+            khaltiInitiationRequest.setAmount(khaltiTotalAmount);
+            khaltiInitiationRequest.setPurchase_order_id(appointment1.getAppointmentId().toString());
+            khaltiInitiationRequest.setPurchase_order_name(appointment1.getService().getServiceName());
+
+            System.out.println("khalti set amount " + khaltiInitiationRequest.getAmount());
+
+
+
+
+            CustomerInfo customerInfo = new CustomerInfo(user.getUsername(), user.getUsername(), user.getUsername(), user.getEmail(), user.getPhoneNumber(), user.getAddress());
+
+            khaltiInitiationRequest.setCustomerInfo(customerInfo);
+
+            KhaltiResponseDTO res =  this.khaltiPayment.callKhalti(khaltiInitiationRequest);
+            System.out.println(res.getPidx());
+            System.out.println(res.getPayment_url());
+            System.out.println(res.getExpires_at());
+        } catch (JsonProcessingException e) {
+            System.out.println("Error processing JSON");
+        throw new RuntimeException("Error processing JSON", e);
+    } catch (HttpClientErrorException e) {
+            System.out.println("Error communicating with Khalti API");
+        throw new RuntimeException("Error communicating with Khalti API", e);
+    } catch (Exception e) {
+            System.out.println("Unexpected error");
+        throw new RuntimeException("Unexpected error", e);
+    }
+        return null;
+    }
+
+
+   public String updatePaymentTable(String pidx, Integer apointmentId){
+        Appointment appointment = getAppointmentById(apointmentId);
+        Payment payment = Payment.builder()
+                .amount(appointment.getService().getPerHourRate())
+                .transactionId(pidx)
+                .paymentMethod("Khalti")
+                .createdAt(LocalDateTime.now())
+                .user(appointment.getUser())
+                .appointment(appointment)
+                .token("SCkjdflG7oidfn")
+                .mobile("mobile")
+                .productIdentity("productIdentity")
+                .productName(appointment.getService().getServiceName())
+                .build();
+        return "Payment table updated";
+
+    }
+
+
+
 
 
 

@@ -50,8 +50,8 @@ public class ProviderController {
     }
 
     @GetMapping("/{providerId}")
-    public ResponseEntity<ProviderDto> getProviderById(@PathVariable Integer providerId){
-        return new ResponseEntity<ProviderDto>(this.providerService.getServiceProviderById(providerId), HttpStatus.OK);
+    public ResponseEntity<ServiceProvider> getProviderById(@PathVariable Integer providerId){
+        return new ResponseEntity<ServiceProvider>(this.providerService.getProviderById(providerId), HttpStatus.OK);
     }
 
 //    @PutMapping("/{providerId}")

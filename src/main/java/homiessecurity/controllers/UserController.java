@@ -5,13 +5,13 @@ import homiessecurity.dtos.Users.UserDto;
 import homiessecurity.payload.ApiResponse;
 import homiessecurity.service.CloudinaryService;
 import homiessecurity.service.UserService;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @RestController
@@ -56,4 +56,6 @@ public class UserController {
         UserDto updatedUserDto = userService.updateUser(userId, updateUserDto);
         return ResponseEntity.ok(updatedUserDto);
     }
+
+
 }

@@ -111,11 +111,9 @@ public class UserServiceImpl implements UserService, UserDetailsService{
             user.setName(updateUserDto.getName());
         }
         if (updateUserDto.getPhoneNumber() != null) {
-            if(userRepo.existsByPhoneNumber(updateUserDto.getPhoneNumber())){
-                throw new ResourceAlreadyExistsException("PhoneNumber is already  in use. Try a new one ");
-            }else{
-                user.setPhoneNumber(updateUserDto.getPhoneNumber());
-            }
+
+            user.setPhoneNumber(updateUserDto.getPhoneNumber());
+
         }
         if (updateUserDto.getAddress() != null) {
             user.setAddress(updateUserDto.getAddress());

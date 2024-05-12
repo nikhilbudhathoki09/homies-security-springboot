@@ -28,6 +28,8 @@ public class ProviderDto {
     private String providerImage;
     private ServiceCategory category;
     private List<Services> allServices;
+    private String registrationDocument;
+    private String experienceDocument;
     private double yearOfExperience;
     private double minServicePrice;
     private double maxServicePrice;

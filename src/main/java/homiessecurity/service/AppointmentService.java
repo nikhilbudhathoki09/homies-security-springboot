@@ -2,6 +2,7 @@ package homiessecurity.service;
 
 import homiessecurity.dtos.Appointments.AppointmentDto;
 import homiessecurity.dtos.Appointments.AppointmentRequestDto;
+import homiessecurity.dtos.khalti.KhaltiResponseDTO;
 import homiessecurity.entities.Appointment;
 import homiessecurity.entities.Status;
 import homiessecurity.payload.ApiResponse;
@@ -11,8 +12,8 @@ import java.util.List;
 
 public interface AppointmentService {
 
-    Appointment addAppointment(AppointmentRequestDto appointment, Integer userId,
-                               Integer providerId, Integer serviceId);
+    KhaltiResponseDTO addAppointment(AppointmentRequestDto appointment, Integer userId,
+                                     Integer providerId, Integer serviceId);
 
     Appointment getAppointmentById(Integer appointmentId);
 
@@ -35,6 +36,8 @@ public interface AppointmentService {
     List<Appointment> getAppointmentsByStatus(String status);
 
     public void sendAppointmentReminders();
+
+    public String updatePaymentTable(String pidx, Integer apointmentId);
 
 
 

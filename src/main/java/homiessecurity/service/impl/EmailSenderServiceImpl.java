@@ -127,7 +127,8 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
 
     private String getUserPasswordResetUrl(String token) {
-        return "http://localhost:8000/api/v1/auth/users/reset-password?token=" + token;
+//        return "http://localhost:8000/api/v1/auth/users/reset-password?token=" + token;
+       return "http://localhost:5173/reset-password?token=" + token;
     }
 
     private String getProviderPasswordResetUrl(String token) {
@@ -137,7 +138,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
 
     public String getVerificationUrl(String token){
-        String url = "http://localhost:8000/api/v1/auth/verify?token=" + token;
+            String url = "http://localhost:8000/api/v1/auth/verify?token=" + token;
         return url;
     }
 
@@ -195,6 +196,34 @@ public class EmailSenderServiceImpl implements EmailSenderService {
             throw new CustomCommonException(e.getMessage());
         }
     }
+
+    public void sendNewRequestEmail(Appointment appointment) {
+        try {
+            Context context = new Context();
+            context.setVariable("providerName", appointment.getProvider().getProviderName());
+            context.setVariable("clientName", appointment.getUser().getName());
+            context.setVariable("appointmentTime", appointment.getArrivalTime());
+            context.setVariable("serviceName", appointment.getService().getServiceName());
+            context.setVariable("detailedLocation", appointment.getDetailedLocation());
+            context.setVariable("arrivalTime", appointment.getArrivalTime());
+
+            String text = templateEngine.process("request", context);
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setSubject("🗓️ New Appointment Request 🗓️");
+            String fromEmail = "nikhilbudhathoki0@gmail.com";
+            fromEmail = fromEmail.trim(); // Ensure there's no leading or trailing whitespace
+            helper.setFrom(fromEmail);
+            helper.setTo(appointment.getProvider().getEmail());
+            helper.setText(text, true);
+
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new CustomCommonException(e.getMessage());
+        }
+    }
+
 
 
 
